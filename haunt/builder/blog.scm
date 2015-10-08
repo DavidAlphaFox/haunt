@@ -38,6 +38,8 @@
             theme-post-template
             theme-collection-template
             with-layout
+            render-post
+            render-collection
 
             date->string*
 
