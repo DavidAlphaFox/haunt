@@ -124,6 +124,9 @@ There is NO WARRANTY, to the extent permitted by law.~%"
       (apply command-main args))))
 
 (define* (haunt-main arg0 . args)
+  ;; Add haunt site directory to Guile's load path so that user's can
+  ;; easily import their own modules.
+  (add-to-load-path (getcwd))
   (setlocale LC_ALL "")
   (match args
     (()
