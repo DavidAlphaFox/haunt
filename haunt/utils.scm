@@ -38,7 +38,8 @@
             delete-file-recursively
             mkdir-p
             string->date*
-            take-up-to))
+            take-up-to
+            make-user-module))
 
 (define* (flatten lst #:optional depth)
   "Return a list that recursively concatenates the sub-lists of LST,
@@ -146,3 +147,11 @@ are fewer than N elements."
         (() '())
         ((head . tail)
          (cons head (take-up-to (1- n) tail))))))
+
+(define (make-user-module modules)
+  "Return a new user module with the additional MODULES loaded."
+  (let ((module (make-fresh-user-module)))
+    (for-each (lambda (iface)
+                (module-use! module (resolve-interface iface)))
+              modules)
+    module))
