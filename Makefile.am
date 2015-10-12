@@ -60,6 +60,15 @@ SOURCES =					\
   haunt/serve/mime-types.scm			\
   haunt/serve/web-server.scm
 
+if HAVE_GUILE_READER
+
+SOURCES +=					\
+  haunt/skribe.scm				\
+  haunt/skribe/utils.scm			\
+  haunt/reader/skribe.scm
+
+endif
+
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README.md					\

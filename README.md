@@ -50,7 +50,11 @@ To view your creation, run `haunt serve` and browse to
 Requirements
 ------------
 
-GNU Guile >= 2.0.11
+- GNU Guile >= 2.0.11
+
+Optional:
+
+- guile-reader (for Skribe support)
 
 Building from Git
 -----------------

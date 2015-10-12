@@ -12,4 +12,8 @@ AC_CONFIG_FILES([scripts/haunt], [chmod +x scripts/haunt])
 
 GUILE_PROGS([2.0.11])
 
+dnl Guile-reader is needed for Skribe support
+GUILE_MODULE_AVAILABLE([have_guile_reader], [(system reader)])
+AM_CONDITIONAL([HAVE_GUILE_READER], [test "x$have_guile_reader" = "xyes"])
+
 AC_OUTPUT
