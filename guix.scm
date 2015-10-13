@@ -20,11 +20,11 @@
 ;;
 ;; GNU Guix development package.  To build and install, run:
 ;;
-;;   guix package -e '(primitive-load "package.scm")'
+;;   guix package -f guix.scm
 ;;
 ;; To use as the basis for a development environment, run:
 ;;
-;;   guix environment -l package.scm
+;;   guix environment -l guix.scm
 ;;
 ;;; Code:
 
@@ -43,10 +43,10 @@
             (method git-fetch)
             (uri (git-reference
                   (url "git://dthompson.us/haunt.git")
-                  (commit "f012747")))
+                  (commit "1ddcff3")))
             (sha256
              (base32
-              "0gj4xw79g3q87m6js0mbvv437zf7df5d2xg4sx65mpgc85j7zafs"))))
+              "0gx1ijbz9k0lcgmv82x49nam1i7r16sqx5v8hbpafkiqyxkm2v1k"))))
   (build-system gnu-build-system)
   (arguments
    '(#:phases
@@ -58,6 +58,8 @@
      ("automake" ,automake)))
   (inputs
    `(("guile" ,guile-2.0)))
+  (propagated-inputs
+   `(("guile-reader" ,guile-reader)))
   (synopsis "Functional static site generator")
   (description "Haunt is a static site generator written in Guile
 Scheme.  Haunt features a functional build system and an extensible

@@ -77,7 +77,7 @@ GNU Guix users can create a build environment with all necessary
 dependencies using the handy `guix environment` tool:
 
 ```
-guix environment -l package.scm
+guix environment -l guix.scm
 ```
 
 Examples
