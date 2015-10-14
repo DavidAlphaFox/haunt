@@ -57,9 +57,18 @@ flattened."
                   lst)))
 
 (define (flat-map proc . lsts)
+  "Apply PROC to each element of each list in LSTS and return a new
+list in which nested lists are concatenated into the result.
+
+For example, the list (1 2 (3)) would be flattened to (1 2 3)."
   (flatten (apply map proc lsts) 1))
 
 (define (string-split-at str char-pred)
+  "Split STR at the first character that matches CHAR-PRED and return
+a list of one or two strings.  Two strings are returned if the string
+was able to be split, with the character matching CHAR-PRED removed.
+A list containing only STR is returned if CHAR-PRED does not match any
+charcter."
   (let ((i (string-index str char-pred)))
     (if i
         (list (string-take str i)
@@ -68,15 +77,20 @@ flattened."
 
 (define (file-name-components file-name)
   "Split FILE-NAME into the components delimited by '/'."
-  (if (string-null? file-name)
-      '()
-      (string-split file-name #\/)))
+  (match file-name
+    ("" '())
+    ("/" '(""))
+    (_ (remove string-null? (string-split file-name #\/)))))
 
 (define (join-file-name-components components)
   "Join COMPONENTS into a file name string."
-  (string-join components "/"))
+  (string-join components "/" 'prefix))
 
 (define (absolute-file-name file-name)
+  "Return a an absolute file name string relative to the current
+working directory for FILE-NAME, a relative file name string.  If
+FILE-NAME happens to already be absolute, FILE-NAME is returned
+as-is."
   (if (absolute-file-name? file-name)
       file-name
       (string-append (getcwd) "/" file-name)))

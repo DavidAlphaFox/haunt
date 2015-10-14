@@ -69,6 +69,13 @@ SOURCES +=					\
 
 endif
 
+TESTS =						\
+  tests/utils.scm
+
+TEST_EXTENSIONS = .scm
+SCM_LOG_COMPILER = $(top_builddir)/test-env $(GUILE)
+AM_SCM_LOG_FLAGS = --no-auto-compile -L "$(top_srcdir)"
+
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README.md					\
