@@ -19,3 +19,4 @@ Makefile.in
 *.trs
 /build-aux/install-sh
 /build-aux/missing
+/build-aux/test-driver
