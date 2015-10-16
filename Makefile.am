@@ -70,6 +70,7 @@ SOURCES +=					\
 endif
 
 TESTS =						\
+  tests/post.scm				\
   tests/utils.scm
 
 TEST_EXTENSIONS = .scm
