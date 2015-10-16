@@ -19,4 +19,11 @@ Makefile.in
 *.trs
 /build-aux/install-sh
 /build-aux/missing
+/build-aux/mdate-sh
+/build-aux/texinfo.tex
 /build-aux/test-driver
+/doc/.dirstamp
+/doc/haunt.html/
+/doc/haunt.info
+/doc/stamp-vti
+/doc/version.texi

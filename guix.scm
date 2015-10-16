@@ -34,7 +34,8 @@
              (guix build-system gnu)
              (gnu packages)
              (gnu packages autotools)
-             (gnu packages guile))
+             (gnu packages guile)
+             (gnu packages texinfo))
 
 (package
   (name "haunt")
@@ -55,7 +56,8 @@
          (lambda _ (zero? (system* "sh" "bootstrap")))))))
   (native-inputs
    `(("autoconf" ,autoconf)
-     ("automake" ,automake)))
+     ("automake" ,automake)
+     ("texinfo" ,texinfo)))
   (inputs
    `(("guile" ,guile-2.0)))
   (propagated-inputs

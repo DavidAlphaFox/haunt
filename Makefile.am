@@ -76,6 +76,8 @@ TEST_EXTENSIONS = .scm
 SCM_LOG_COMPILER = $(top_builddir)/test-env $(GUILE)
 AM_SCM_LOG_FLAGS = --no-auto-compile -L "$(top_srcdir)"
 
+info_TEXINFOS = doc/haunt.texi
+
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README.md					\

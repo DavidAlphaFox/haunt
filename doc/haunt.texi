@@ -1,0 +1,302 @@
+\input texinfo
+@c -*-texinfo-*-
+
+@c %**start of header
+@setfilename haunt.info
+@documentencoding UTF-8
+@settitle Haunt Reference Manual
+@c %**end of header
+
+@include version.texi
+
+@copying
+Copyright @copyright{} 2015 David Thompson@*
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled ``GNU Free
+Documentation License''.
+@end copying
+
+@titlepage
+@title Haunt Reference Manual
+@subtitle Using Haunt
+@author The Haunt Developers
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+@value{UPDATED} @*
+
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Haunt
+
+This document describes Haunt version @value{VERSION}, an extensible,
+functional static site generator.
+
+@menu
+* Introduction::                About Haunt.
+* Installation::                Installing Haunt.
+* Tutorial::                    How to get started quickly.
+* Command-line Interface::      Using Haunt from the command-line.
+* Programming Interface::       Using the Haunt API in Scheme.
+* Contributing::                How to contribute to Haunt.
+
+* GNU Free Documentation License::  The license of this manual.
+* Concept Index::               Concepts.
+* Programming Index::           Data types, procedures, syntax, and variables.
+
+@detailmenu
+ --- The Detailed Node Listing ---
+
+Installation
+
+* Downloading::                 Downloading the source code.
+* Requirements::                Software needed to build and run Haunt.
+* Building::                    Building from source code.
+
+@end detailmenu
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+Haunt is a hackable static site generator written in Guile Scheme.  A
+static site generator assists an author with generating the HTML pages
+that they publish on the web.  Unlike ``content management systems''
+such as Wordpress or Drupal, static site generators are not dynamic
+web applications (complete with a relational database) that build
+pages on-the-fly.  Instead, web pages are built in advance, on the
+author's computer, and copied to a web server when it is time to
+publish changes.  The consequence of this design is that the web
+server no longer needs to run a complex, potentially insecure web
+application that connects to a database to retrieve data.  Static
+files can be served easily by any generic web server.  Since there is
+no web application or database server to deal with, static websites
+are easier to maintain, more secure, and resistant to high web traffic
+(``slashdotting.'')  Furthermore, the entire website is stored in
+plain text, which allows the files to be version-controlled rather
+than kept in a relational database with no concept of history that
+needs to be backed up regularly.
+
+At the time that Haunt was conceived, there existed literally hundreds
+of other static site generators.  Why add another one?  Haunt
+differentiates itself from most other static site generators in that
+it aspires to the Emacs philosophy of ``practical software freedom.''
+Not only is the source code available under a Free Software license,
+as most static site generators are, it is designed to be easily hacked
+and extended without altering the core source code.  Haunt
+purposefully blurs the line between document and program, author and
+programmer, by embracing the notion of data as code.  A Haunt-based
+website is not simply data, but a computer program.  This design
+strategy encourages authors to automate repetitive tasks and empowers
+them to extend the software with their own ideas.
+
+To make such a system work well, a general-purpose, extensible
+programming language is needed.  A traditional configuration file
+format simply will not do.  The programming language that we feel is
+best suited to this task is Scheme, a clean and elegant dialect of
+Lisp.  We believe that by giving authors the full expressive power of
+Scheme, they will be able to produce better websites and make better
+use of their time than with less programmable systems and less capable
+programming languages.  Authors should feel empowered to hack the
+system to make it do what they want rather than what some programmer
+decided they should want.  And perhaps most importantly, building
+websites with Haunt should be @emph{fun}.
+
+Websites written in Haunt are described as purely functional programs
+that accept ``posts'', text documents containing arbitrary metadata,
+as input and transform them into complete HTML pages using Scheme
+procedures.  Haunt has no opinion about what markup language authors
+should use to write their posts and will happily work with any format
+for which a ``reader'' procedure exists.  Likewise, Haunt also has no
+opinion about how authors should structure their sites, but has sane
+defaults.  Currently, there exist helpful ``builder'' procedures that
+do common tasks such as generating a blog or Atom feed.  While the
+built-in features may be enough for some, they surely will not be
+enough for all.  Haunt's Scheme API empowers authors to easily tweak
+existing components, write replacements, or add entirely new features
+that do things no else has thought to do yet.
+
+Happy haunting!
+
+@node Installation
+@chapter Installation
+
+@menu
+* Downloading::                 Downloading the source code.
+* Requirements::                Software needed to build and run Haunt.
+* Building::                    Building from source code.
+@end menu
+
+@node Downloading
+@section Downloading
+
+Official Haunt source code release tarballs can be found on the
+@url{http://haunt.dthompson.us/downloads.html, downloads page} of
+Haunt's website, along with their associated checksums.
+
+@node Requirements
+@section Requirements
+
+Haunt depends on the following packages:
+
+@itemize
+@item
+@url{https://gnu.org/software/guile, GNU Guile} version 2.0.11 or
+later
+@end itemize
+
+The following dependencies are optional:
+
+@itemize
+@item
+@url{http://www.nongnu.org/guile-reader/, Guile-Reader} version 0.6 or
+later (for Skribe support)
+@end itemize
+
+@node Building
+@section Building
+
+Haunt uses the standard GNU build system, so the basic installation
+procedure looks like this:
+
+@example
+./configure
+make
+make install
+@end example
+
+@node Tutorial
+@chapter Tutorial
+
+The goal of this tutorial is to quickly create a barebones blog with
+Haunt in order to demonstrate the basic workflow and key concepts.
+
+First, create a directory for the new site:
+
+@example
+mkdir haunt-tutorial
+cd haunt-tutorial
+@end example
+
+Next, create the site configuration file @file{haunt.scm}.  This is
+where all of the code for building the website will go.
+
+Here's what a simple Haunt configuration looks like:
+
+@example
+(use-modules (haunt asset)
+             (haunt site)
+             (haunt builder blog)
+             (haunt builder atom)
+             (haunt reader skribe))
+
+(site #:title "My First Haunt Site"
+      #:domain "example.com"
+      #:default-metadata
+      '((author . "Eva Luator")
+        (email  . "eva@@example.com"))
+      #:readers (list skribe-reader)
+      #:builders (list (blog)
+                       (atom-feed)
+                       (atom-feeds-by-tag)))
+@end example
+
+Haunt represents the full configuration of the website using the
+@code{site} procedure.  Site objects specify things like the site
+title, the default metadata to use for posts, which markup formats are
+supported, and which builders are used to generate web pages.
+
+With the above code saved into the @file{haunt.scm} file, the next
+step is to create a @file{posts} directory and populate it with
+articles to publish.  Put the text below into a file named
+@file{posts/hello.skr}:
+
+@example
+(post
+ :title "Hello, World!"
+ :date (make-date* 2015 10 15)
+ :tags '("hello")
+
+ (h1 [Hello, World!])
+
+ (p [This is my very first Skribe document!]))
+@end example
+
+This is a
+@url{http://www.nongnu.org/skribilo/doc/user-3.html#skribe-syntax,
+Skribe} document.  Skribe is one of the built-in languages that Haunt
+knows how to work with.  It's basically Scheme, but with support for
+writing literal text without quoting it all by enclosing it in square
+brackets.  The code above defines a post named ``Hello, World!'' with
+a publishing date of 2015-10-15, whose contents are just a single
+heading and a paragraph.
+
+To build the site, run @command{haunt build} to compile all of the
+HTML pages.  To view the results, run @command{haunt serve} and visit
+@url{http://localhost:8080} in a web browser.  @command{haunt serve}
+is a handy utility that serves the contents of the website using
+Guile's built-in HTTP server.  Since the blog builder was specified in
+@file{haunt.scm}, the default index page is a simple listing of all
+posts, which for now is a single post.  Clicking on the post title
+will display a page with only that post's contents.
+
+In addition to the basic blog builder, the @file{haunt.scm} file
+specifies two additional builders for Atom feeds.  The
+@code{atom-feed} builder creates a feed of all posts located at
+@url{http://localhost:8080/feed.xml}.  The @code{atom-feeds-by-tag}
+builder creates one feed for each unique tag specified in the post
+metadata.  There's only one tag right now, ``hello'', and its feed is
+located at @url{http://localhost/feeds/tags/hello.xml}.
+
+Tweaking a post, rebuilding the site, and viewing the results in a web
+browser is the typical Haunt workflow.  However, having to run
+@command{haunt build} every after each edit is tedious.  To address
+this, run @command{haunt serve --watch}.  The Haunt web server, in
+addition to serving web pages, will now watch for changes to important
+files and automatically rebuild the site when they are edited.  This
+streamlines the workflow into an edit, save, view loop.
+
+Now that we've introduced the basic utilities and concepts, continue
+reading this manual to learn more about Haunt's command-line and
+programming interfaces.
+
+@node Command-line Interface
+@chapter Command-line Interface
+
+@node Programming Interface
+@chapter Programming Interface
+
+@node Contributing
+@chapter Contributing
+
+@c *********************************************************************
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+
+@include fdl-1.3.texi
+
+@c *********************************************************************
+@node Concept Index
+@unnumbered Concept Index
+@printindex cp
+
+@node Programming Index
+@unnumbered Programming Index
+@syncodeindex tp fn
+@syncodeindex vr fn
+@printindex fn
+
+@bye
+
+@c Local Variables:
+@c ispell-local-dictionary: "american";
+@c End:
