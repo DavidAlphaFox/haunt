@@ -26,6 +26,8 @@
 (define (make-date* year month day)
   (make-date 0 0 0 0 day month year 0))
 
+(define %tzoffset (date-zone-offset (current-date)))
+
 (test-equal "post-ref"
   '(hello test)
   (post-ref (make-post "foo.skr" '((tags hello test)) '()) 'tags))
@@ -62,8 +64,19 @@
   (parse-metadata 'tags "foo, bar, baz"))
 
 (test-equal "parse-metadata, date"
-  (make-date 0 0 30 22 15 10 2015 (date-zone-offset (current-date)))
+  (make-date 0 0 30 22 15 10 2015 %tzoffset)
   (parse-metadata 'date "2015-10-15 22:30"))
+
+(test-equal "read-metadata-headers"
+  `((tags "foo" "bar" "baz")
+    (date . ,(make-date 0 0 30 22 15 10 2015 %tzoffset))
+    (title . "Hello, World!"))
+  (pk 'meta (call-with-input-string "title: Hello, World!
+date: 2015-10-15 22:30
+tags: foo, bar, baz
+---
+"
+     read-metadata-headers)))
 
 (test-end)
 

@@ -23,6 +23,8 @@
 ;;; Code:
 
 (define-module (haunt post)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 rdelim)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
@@ -40,7 +42,8 @@
             posts/group-by-tag
 
             register-metdata-parser!
-            parse-metadata))
+            parse-metadata
+            read-metadata-headers))
 
 (define-record-type <post>
   (make-post file-name metadata sxml)
@@ -106,6 +109,20 @@ specified."
 
 (define (parse-metadata key value)
   ((metadata-parser key) value))
+
+(define (read-metadata-headers port)
+  (let loop ((metadata '()))
+    (let ((line (read-line port)))
+      (cond
+       ((eof-object? line)
+        (error "end of file while reading metadata: " (port-filename port)))
+       ((string=? line "---")
+        metadata)
+       (else
+        (match (map string-trim-both (string-split-at line #\:))
+          (((= string->symbol key) value)
+           (loop (alist-cons key (parse-metadata key value) metadata)))
+          (_ (error "invalid metadata format: " line))))))))
 
 (register-metadata-parser!
  'tags

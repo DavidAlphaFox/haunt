@@ -30,7 +30,6 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex)
-  #:use-module (ice-9 rdelim)
   #:use-module (sxml simple)
   #:use-module (haunt post)
   #:use-module (haunt utils)
@@ -105,20 +104,9 @@ post."
                            (assq-ref contents 'content))))))
 
 (define (read-html-post port)
-  (let loop ((metadata '()))
-    (let ((line (read-line port)))
-      (cond
-       ((eof-object? line)
-        (error "end of file while reading metadata: " (port-filename port)))
-       ((string=? line "---")
-        (values metadata
-                (match (xml->sxml port)
-                  (('*TOP* sxml) sxml))))
-       (else
-        (match (map string-trim-both (string-split-at line #\:))
-          (((= string->symbol key) value)
-           (loop (alist-cons key (parse-metadata key value) metadata)))
-          (_ (error "invalid metadata format: " line))))))))
+  (values (read-metadata-headers port)
+          (match (xml->sxml port)
+            (('*TOP* sxml) sxml))))
 
 (define html-reader
   (make-reader (make-file-extension-matcher "html")
