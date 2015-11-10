@@ -20,7 +20,7 @@
  (p [And here's a code snippet of how I build Haunt using GNU Guix:])
 
  (source-code
-  "guix environment -l package.scm
+  "guix environment -l guix.scm
 ./configure
 make")
 

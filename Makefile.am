@@ -1,5 +1,6 @@
 ## Haunt --- Static site generator for GNU Guile
 ## Copyright © 2015 David Thompson <davet@gnu.org>
+## Copyright © 2015 Mathieu Lirzin <mthl@gnu.org>
 ##
 ## This file is part of Haunt.
 ##
@@ -83,7 +84,7 @@ info_TEXINFOS = doc/haunt.texi
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README.md					\
-  package.scm
+  guix.scm
 
 SUBDIRS =					\
   example					\
