@@ -30,8 +30,6 @@
   #:use-module (haunt utils)
   #:export (texinfo-reader))
 
-(use-modules (srfi srfi-19))
-
 (define texi->shtml
   (compose stexi->shtml texi-fragment->stexi))
 
