@@ -84,7 +84,7 @@ doc_haunt_TEXINFOS = doc/fdl-1.3.texi
 
 EXTRA_DIST +=					\
   pre-inst-env.in				\
-  README.md					\
+  README					\
   guix.scm
 
 SUBDIRS =					\
