@@ -20,6 +20,11 @@ copy of the license is included in the section entitled ``GNU Free
 Documentation License''.
 @end copying
 
+@dircategory Web development
+@direntry
+* Haunt: (haunt).       Haunt, the functional static site generator.
+@end direntry
+
 @titlepage
 @title Haunt Reference Manual
 @subtitle Using Haunt
