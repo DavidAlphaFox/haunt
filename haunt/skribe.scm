@@ -1,5 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright 2005, 2006 Ludovic Courtès <ludovic.courtes@laas.fr>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -19,6 +20,7 @@
 ;;; Commentary:
 ;;
 ;; Skribe reader.
+;; Much code taken from the excellent Skribilo project.
 ;;
 ;;; Code:
 
