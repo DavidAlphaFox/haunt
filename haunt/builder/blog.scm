@@ -1,5 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2016 Christopher Allan Webber <cwebber@dustycloud.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -53,11 +54,41 @@
   (post-template theme-post-template)
   (collection-template theme-collection-template))
 
+(define (ugly-default-layout site title body)
+  `((doctype "html")
+    (head
+     (meta (@ (charset "utf-8")))
+     (title ,(string-append title " — " (site-title site))))
+    (body
+     (h1 ,(site-title site))
+     ,body)))
+
+(define (ugly-default-post-template post)
+  `((h2 ,(post-ref post 'title))
+    (h3 "by " ,(post-ref post 'author)
+        " — " ,(date->string* (post-date post)))
+    (div ,(post-sxml post))))
+
+(define (ugly-default-collection-template site title posts prefix)
+  (define (post-uri post)
+    (string-append "/" (or prefix "")
+                   (site-post-slug site post) ".html"))
+
+  `((h3 ,title)
+    (ul
+     ,@(map (lambda (post)
+              `(li
+                (a (@ (href ,(post-uri post)))
+                   ,(post-ref post 'title)
+                   " — "
+                   ,(date->string* (post-date post)))))
+            posts))))
+
 (define* (theme #:key
                 (name "Untitled")
-                layout
-                post-template
-                collection-template)
+                (layout ugly-default-layout)
+                (post-template ugly-default-post-template)
+                (collection-template ugly-default-collection-template))
   (make-theme name layout post-template collection-template))
 
 (define (with-layout theme site title body)
@@ -78,36 +109,9 @@
 
 (define ugly-theme
   (theme #:name "Ugly"
-         #:layout
-         (lambda (site title body)
-           `((doctype "html")
-             (head
-              (meta (@ (charset "utf-8")))
-              (title ,(string-append title " — " (site-title site))))
-             (body
-              (h1 ,(site-title site))
-              ,body)))
-         #:post-template
-         (lambda (post)
-           `((h2 ,(post-ref post 'title))
-             (h3 "by " ,(post-ref post 'author)
-                 " — " ,(date->string* (post-date post)))
-             (div ,(post-sxml post))))
-         #:collection-template
-         (lambda (site title posts prefix)
-           (define (post-uri post)
-             (string-append "/" (or prefix "")
-                            (site-post-slug site post) ".html"))
-
-           `((h3 ,title)
-             (ul
-              ,@(map (lambda (post)
-                       `(li
-                         (a (@ (href ,(post-uri post)))
-                            ,(post-ref post 'title)
-                            " — "
-                            ,(date->string* (post-date post)))))
-                     posts))))))
+         #:layout ugly-default-layout
+         #:post-template ugly-default-post-template
+         #:collection-template ugly-default-collection-template))
 
 (define* (blog #:key (theme ugly-theme) prefix
                (collections
