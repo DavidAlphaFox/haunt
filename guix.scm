@@ -35,6 +35,7 @@
              (gnu packages)
              (gnu packages autotools)
              (gnu packages guile)
+             (gnu packages pkg-config)
              (gnu packages texinfo))
 
 (package
@@ -57,6 +58,7 @@
   (native-inputs
    `(("autoconf" ,autoconf)
      ("automake" ,automake)
+     ("pkg-config" ,pkg-config)
      ("texinfo" ,texinfo)))
   (inputs
    `(("guile" ,guile-2.0)))
