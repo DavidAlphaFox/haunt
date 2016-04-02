@@ -363,6 +363,87 @@ modules.  This section documents the public API.
 @node Sites
 @section Sites
 
+A site object defines all of the properties for a Haunt website: The
+site name, domain name, where blog posts are found, what post formats
+are understood, which procedures are used to build the site, where the
+output files are written to, etc.
+
+@deffn {Scheme Procedure} site [#:title "This Place is Haunted"] @
+       [#:domain "example.com"] [#:posts-directory "posts"] @
+       [#:file-filter @var{default-file-filter}] @
+       [#:build-directory "site"] [#:default-metadata '()] @
+       [#:make-slug @var{post-slug}] [#:readers '()] @
+       [#:builders '()]
+Create a new site object.  All arguments are optional:
+
+@table @code
+
+@item @var{title}
+The name of the site.
+
+@item @var{posts-directory}
+The directory where posts are found.
+
+@item @var{file-filter}
+A predicate procedure that returns #f when a post file should be
+ignored, and #f otherwise.  Emacs temp files are ignored by default.
+
+@item @var{build-directory}
+The directory that generated pages are stored in.
+
+@item @var{default-metadata}
+An alist of arbitrary default metadata for posts whose keys are
+symbols.
+
+@item @var{make-slug}
+A procedure generating a file name slug from a post.
+
+@item @var{readers}
+A list of reader objects for processing posts.
+
+@item @var{builders}
+A list of procedures for building pages from posts.
+
+@end table
+
+@end deffn
+
+@deffn {Scheme Procedure} site? @var{obj}
+Return @code{#t} if @var{obj} is a site object.
+@end deffn
+
+@deffn {Scheme Procedure} site-title @var{site}
+Return the title of @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-domain @var{site}
+Return the domain of @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-posts-directory @var{site}
+Return the posts directory for @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-file-filter @var{site}
+Return the file filter procedure for @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-build-directory @var{site}
+Return the build directory of @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-make-slug @var{site}
+Return the slug constructor for @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-readers @var{site}
+Return the list of reader procedures for @var{site}.
+@end deffn
+
+@deffn {Scheme Procedure} site-builders @var{site}
+Return the list of builder procedures for @var{site}.
+@end deffn
+
 @node Posts
 @section Posts
 
