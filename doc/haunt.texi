@@ -277,8 +277,103 @@ programming interfaces.
 @node Command-line Interface
 @chapter Command-line Interface
 
+@menu
+* Invoking haunt build::        Build the website.
+* Invoking haunt serve::        Serve the website over HTTP.
+@end menu
+
+The Haunt command-line interface is composed of many subcommands.  The
+general syntax for all Haunt commands is:
+
+@example
+haunt @var{subcommand} @var{options}@dots{}
+@end example
+
+@node Invoking haunt build
+@section Invoking @command{haunt build}
+
+The @command{haunt build} command realizes a Haunt site configuration
+file by compiling web pages and copying static assets to the output
+directory.  For details on how to configure a Haunt site,
+@pxref{Sites}.
+
+Example:
+
+@example
+haunt build --config=haunt.scm
+@end example
+
+@table @code
+
+@item --config=@var{configuration-file}
+@itemx -c @var{configuration-file}
+Load the Haunt site declaration from @var{configuration-file}.
+
+@end table
+
+@node Invoking haunt serve
+@section Invoking @command{haunt serve}
+
+The @command{haunt serve} command allows one to quickly view a local
+preview of the generated website before publishing the finished
+product to a remote web server.  When @command{haunt serve} runs, a
+local HTTP server is spawned.  Visit the server using a web browser to
+inspect the results of the build.  By default, the web server listens
+on port 8080, so the URL to visit would be
+@url{http://localhost:8080}.
+
+While developing, it is common to rebuild the site frequently to view
+the results of incremental changes.  Rather than manually running
+@command{haunt build} (@ref{Invoking haunt build}) each time changes
+are made, the @code{--watch} flag can be used to automatically rebuild
+the site when a source file changes on disk.
+
+@table @code
+
+@item --config=@var{configuration-file}
+@itemx -c @var{configuration-file}
+Load the Haunt site declaration from @var{configuration-file}.
+
+@item --port=@var{port}
+@itemx -p @var{port}
+
+Listen for HTTP requests on @var{port}.
+
+@item --watch
+@itemx -w
+
+Automatically rebuild the site when source files change.
+
+@end table
+
 @node Programming Interface
 @chapter Programming Interface
+
+@menu
+* Sites::                       Description of the site and how to build it.
+* Posts::                       Articles, prose, blog posts, etc.
+* Readers::                     Post interpreters.
+* Pages::                       HTML/XML pages.
+* Assets::                      Images, stylesheets, etc.
+@end menu
+
+Haunt is a fully-programmable system composed of several Guile Scheme
+modules.  This section documents the public API.
+
+@node Sites
+@section Sites
+
+@node Posts
+@section Posts
+
+@node Readers
+@section Readers
+
+@node Pages
+@section Pages
+
+@node Assets
+@section Assets
 
 @node Contributing
 @chapter Contributing
