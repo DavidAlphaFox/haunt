@@ -31,7 +31,7 @@
             p blockquote em
             h1 h2 h3 h4
             code pre strong
-            ul li dl dt dd
+            ul ol li dl dt dd
             anchor
             image
             source-code
