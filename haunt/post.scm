@@ -56,10 +56,13 @@
   "Return the metadata corresponding to KEY within POST."
   (assq-ref (post-metadata post) key))
 
+(define char-set:slug
+  (char-set-union char-set:letter+digit (char-set #\-)))
+
 (define (post-slug post)
   "Transform the title of POST into a URL slug."
   (string-join (map (lambda (s)
-                      (string-filter char-set:letter+digit s))
+                      (string-filter char-set:slug s))
                     (string-split (string-downcase (post-ref post 'title))
                                   char-set:whitespace))
                "-"))
