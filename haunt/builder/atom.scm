@@ -1,5 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2016 Christopher Allan Webber <cwebber@dustycloud.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -44,7 +45,7 @@
   "Convert date to ISO-8601 formatted string."
   (date->string date "~4"))
 
-(define (post->atom-entry site post)
+(define* (post->atom-entry site post #:key (blog-prefix ""))
   "Convert POST into an Atom <entry> XML node."
   `(entry
     (title ,(post-ref post 'title))
@@ -53,7 +54,8 @@
      ,(let ((email (post-ref post 'email)))
         (if email `(email ,email) '())))
     (updated ,(date->string* (post-date post)))
-    (link (@ (href ,(string-append "/" (site-post-slug site post) ".html"))
+    (link (@ (href ,(string-append "/" blog-prefix
+                                   (site-post-slug site post) ".html"))
              (rel "alternate")))
     (summary (@ (type "html"))
              ,(sxml->html-string (post-sxml post)))))
@@ -62,7 +64,8 @@
                     (file-name "feed.xml")
                     (subtitle "Recent Posts")
                     (filter posts/reverse-chronological)
-                    (max-entries 20))
+                    (max-entries 20)
+                    (blog-prefix ""))
   "Return a builder procedure that renders a list of posts as an Atom
 feed.  All arguments are optional:
 
@@ -79,14 +82,16 @@ MAX-ENTRIES: The maximum number of posts to render in the feed"
                       (link (@ (href ,(string-append "/" file-name))
                                (rel "self")))
                       (link (@ (href ,(site-domain site))))
-                      ,@(map (cut post->atom-entry site <>)
+                      ,@(map (cut post->atom-entry site <>
+                                  #:blog-prefix blog-prefix)
                              (take-up-to max-entries (filter posts))))
                sxml->xml*)))
 
 (define* (atom-feeds-by-tag #:key
                             (prefix "feeds/tags")
                             (filter posts/reverse-chronological)
-                            (max-entries 20))
+                            (max-entries 20)
+                            (blog-prefix ""))
   "Return a builder procedure that renders an atom feed for every tag
 used in a post.  All arguments are optional:
 
@@ -100,6 +105,7 @@ MAX-ENTRIES: The maximum number of posts to render in each feed"
              ((atom-feed #:file-name (string-append prefix "/" tag ".xml")
                          #:subtitle (string-append "Tag: " tag)
                          #:filter filter
-                         #:max-entries max-entries)
+                         #:max-entries max-entries
+                         #:blog-prefix blog-prefix)
               site posts)))
            tag-groups))))
