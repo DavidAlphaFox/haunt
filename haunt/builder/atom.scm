@@ -54,7 +54,7 @@
      ,(let ((email (post-ref post 'email)))
         (if email `(email ,email) '())))
     (updated ,(date->string* (post-date post)))
-    (link (@ (href ,(string-append "/" blog-prefix
+    (link (@ (href ,(string-append blog-prefix "/"
                                    (site-post-slug site post) ".html"))
              (rel "alternate")))
     (summary (@ (type "html"))

@@ -71,7 +71,7 @@
 
 (define (ugly-default-collection-template site title posts prefix)
   (define (post-uri post)
-    (string-append "/" (or prefix "")
+    (string-append (or prefix "") "/"
                    (site-post-slug site post) ".html"))
 
   `((h3 ,title)
