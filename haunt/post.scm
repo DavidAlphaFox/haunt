@@ -1,5 +1,6 @@
 ;;; Haunt --- Static site generator for GNU Guile
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2016 Christopher Allan Webber <cwebber@dustycloud.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -61,11 +62,12 @@
 
 (define (post-slug post)
   "Transform the title of POST into a URL slug."
-  (string-join (map (lambda (s)
-                      (string-filter char-set:slug s))
-                    (string-split (string-downcase (post-ref post 'title))
-                                  char-set:whitespace))
-               "-"))
+  (or (post-ref post 'slug)
+      (string-join (map (lambda (s)
+                          (string-filter char-set:slug s))
+                        (string-split (string-downcase (post-ref post 'title))
+                                      char-set:whitespace))
+                   "-")))
 
 (define %default-date
   (make-date 0 0 0 0 1 1 1970 0)) ; UNIX epoch
