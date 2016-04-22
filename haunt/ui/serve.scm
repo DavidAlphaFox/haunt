@@ -70,6 +70,19 @@ Start an HTTP server for the current site.~%")
   (cons '(port . 8080)
         %default-common-options))
 
+(define (call-with-error-handling thunk)
+  (catch #t
+    thunk
+    (lambda (key . args)
+      (let ((cep (current-error-port))
+            (stack (make-stack #t 1)))
+        (display "ERROR: site rebuild failed\n\n" cep)
+        (display "Backtrace:\n" cep)
+        (display-backtrace stack cep)
+        (newline cep)
+        (apply display-error (stack-ref stack 0) cep args)
+        (newline cep)))))
+
 ;; XXX: Make this less naive.
 (define (watch config-file check-dir? check-file?)
   "Watch the current working directory for changes to any of its files
@@ -100,7 +113,9 @@ site."
   (let loop ((time (current-time)))
     (when (any-files-changed? time)
       (display "rebuilding...\n")
-      (build-site (load-config config-file)))
+      (call-with-error-handling
+        (lambda ()
+          (build-site (load-config config-file)))))
     (let ((next-time (current-time)))
       (sleep 1)
       (loop next-time))))
