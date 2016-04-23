@@ -355,6 +355,7 @@ Automatically rebuild the site when source files change.
 * Readers::                     Post interpreters.
 * Pages::                       HTML/XML pages.
 * Assets::                      Images, stylesheets, etc.
+* Builders::                    Web page builders.
 @end menu
 
 Haunt is a fully-programmable system composed of several Guile Scheme
@@ -363,6 +364,10 @@ modules.  This section documents the public API.
 @node Sites
 @section Sites
 
+@example
+(use-modules (haunt site))
+@end example
+
 A site object defines all of the properties for a Haunt website: The
 site name, domain name, where blog posts are found, what post formats
 are understood, which procedures are used to build the site, where the
@@ -370,38 +375,39 @@ output files are written to, etc.
 
 @deffn {Scheme Procedure} site [#:title "This Place is Haunted"] @
        [#:domain "example.com"] [#:posts-directory "posts"] @
-       [#:file-filter @var{default-file-filter}] @
+       [#:file-filter @code{default-file-filter}] @
        [#:build-directory "site"] [#:default-metadata '()] @
-       [#:make-slug @var{post-slug}] [#:readers '()] @
+       [#:make-slug @code{post-slug}] [#:readers '()] @
        [#:builders '()]
 Create a new site object.  All arguments are optional:
 
-@table @code
+@table @var
 
-@item @var{title}
+@item title
 The name of the site.
 
-@item @var{posts-directory}
+@item posts-directory
 The directory where posts are found.
 
-@item @var{file-filter}
-A predicate procedure that returns #f when a post file should be
-ignored, and #f otherwise.  Emacs temp files are ignored by default.
+@item file-filter
+A predicate procedure that returns @code{#f} when a post file should
+be ignored, and @code{#t} otherwise.  Emacs temporary files are
+ignored by default.
 
-@item @var{build-directory}
+@item build-directory
 The directory that generated pages are stored in.
 
-@item @var{default-metadata}
+@item default-metadata
 An alist of arbitrary default metadata for posts whose keys are
 symbols.
 
-@item @var{make-slug}
+@item make-slug
 A procedure generating a file name slug from a post.
 
-@item @var{readers}
+@item readers
 A list of reader objects for processing posts.
 
-@item @var{builders}
+@item builders
 A list of procedures for building pages from posts.
 
 @end table
@@ -447,14 +453,390 @@ Return the list of builder procedures for @var{site}.
 @node Posts
 @section Posts
 
+@example
+(use-modules (haunt post))
+@end example
+
+Posts represent the articles that are kept in a site's post directory
+and written in a markup format that Haunt can
+understand. @pxref{Readers}) for how files on disk can be transformed
+into posts.
+
+@deffn {Scheme Procedure} make-post @var{file-name} @var{metadata} @var{sxml}
+Create a new post object that represents the contents of the file
+@var{file-name}.  The body of the post, @var{sxml}, is represented as
+an SXML tree (@pxref{SXML, SXML,, guile, GNU Guile Reference Manual})
+and the metadata is an association list (@pxref{Association Lists,
+Association Lists,, guile, GNU Guile Reference Manual}) of arbitrary
+key/value pairs.
+@end deffn
+
+@deffn {Scheme Procedure} post? @var{object}
+Return @code{#t} if @var{object} is a post.
+@end deffn
+
+@deffn {Scheme Procedure} post-file-name @var{post}
+Return the file name for @var{post}.
+@end deffn
+
+@deffn {Scheme Procedure} post-metadata @var{post}
+Return the metadata association list for @var{post}.
+@end deffn
+
+@deffn {Scheme Procedure} post-sxml @var{post}
+Return the SXML tree for @var{post}.
+@end deffn
+
+@deffn {Scheme Procedure} post-ref @var{post} @var{key}
+Return the metadata value corresponding to @var{key} within
+@var{post}.
+@end deffn
+
+@deffn {Scheme Procedure} post-slug @var{post}
+Transform the title of @var{post} into a URL slug suitable for the
+file name of a web page.
+@end deffn
+
+@defvr {Scheme Variable} %default-date
+The default date of a post when no other date is specified in the
+metadata association list.
+@end defvr
+
+@deffn {Scheme Procedure} post-data @var{post}
+Return the date for @var{post}, or @code{%default-date} if no date is
+specified.
+@end deffn
+
+@deffn {Scheme Procedure} posts/reverse-chronological @var{posts}
+Sort @var{posts}, a list of posts, in reverse chronological order.
+@end deffn
+
+@deffn {Scheme Procedure} posts/group-by-tag @var{posts}
+Create an association list of tags mapped to the posts in the list
+@var{posts} that used them.
+@end deffn
+
 @node Readers
 @section Readers
+
+@example
+(use-modules (haunt reader))
+@end example
+
+The purpose of a reader is to translate the markup within a post file
+into an SXML tree representing the HTML structure and associate some
+metadata with it.
+
+@deffn {Scheme Procedure} make-reader @var{matcher} @var{proc}
+Create a new reader.  The reader is to be activated when
+@var{matcher}, a procedure that accepts a file name as its only
+argument, returns @code{#t}.  When a post file matches, the procedure
+@var{proc}, which also accepts a file name as its only argument, reads
+the contents and returns a post object (@pxref{Posts}).
+@end deffn
+
+@deffn {Scheme Procedure} reader? @var{object}
+Return @code{#t} if @var{object} is a reader.
+@end deffn
+
+@deffn {Scheme Procedure} reader-matcher @var{reader}
+Return the match procedure for @var{reader}.
+@end deffn
+
+@deffn {Scheme Procedure} reader-matcher @var{reader}
+Return the read procedure for @var{reader}.
+@end deffn
+
+@deffn {Scheme Procedure} reader-match? @var{reader} @var{file-name}
+Return @code{#t} if @var{file-name} is a file supported by
+@var{reader}.
+@end deffn
+
+@deffn {Scheme Procedure} read-post @var{reader} @var{file-name} [@var{default-metadata}]
+Read a post object from @var{file-name} using @var{reader}, merging
+its metadata with @var{default-metadata}, or the empty list if not
+specified.
+@end deffn
+
+@deffn {Scheme Procedure} read-posts @var{directory} @var{keep?} @var{readers} [@var{default-metadata}]
+Read all of the files in @var{directory} that match @var{keep?} as
+post objects.  The @var{readers} list must contain a matching reader
+for every post.
+@end deffn
+
+@deffn {Scheme Procedure} make-file-extension-matcher @var{ext}
+Create a procedure that returns @code{#t} when a file name ends with
+``.ext''.
+@end deffn
+
+@defvr {Scheme Procedure} sxml-reader
+A basic reader for posts written as Scheme code that evaluates to an
+an association list.  The special key @code{content} contains the post
+body as an SXML tree.
+
+Example:
+
+@example
+(use-modules (haunt utils))
+
+`((title . "Hello, world!")
+  (date . ,(string->date* "2015-04-10 23:00"))
+  (tags "foo" "bar")
+  (summary . "Just a test")
+  (content
+   ((h2 "Hello!")
+    (p "This is Haunt.  A static site generator for GNU Guile."))))
+@end example
+
+@end defvr
+
+@defvr {Scheme Procedure} html-reader
+A basic reader for posts written in plain ol' HTML.  Metadata is
+encoded as the @code{key: value} pairs, one per line, at the beginning
+of the file.  A line with the @code{---} sentinel marks the end of the
+metadata section and the rest of the file is encoded as HTML.
+
+Example:
+
+@example
+title: A Foo Walks Into a Bar
+date: 2015-04-11 20:00
+tags: bar
+---
+<p>
+  This is an example using raw HTML, because Guile doesn't have a
+  Markdown parser.
+</p>
+@end example
+
+@end defvr
 
 @node Pages
 @section Pages
 
+@example
+(use-modules (haunt page))
+@end example
+
+Page objects represent files that have yet to be written to disk.
+Their contents may be any arbitrary object that their writer procedure
+knows how to serialize.  In practice, pages are almost always written
+to disk as HTML or XML.
+
+@deffn {Scheme Procedure} make-page @var{file-name} @var{contents} @var{writer}
+Create a new page object.  The string @var{file-name} specifies where
+the page should be written to in the file system.  The procedure
+@var{writer} is responsible for serializing @var{contents}.
+@end deffn
+
+@deffn {Scheme Procedure} page? @var{object}
+Return @code{#t} if @var{object} is a page object.
+@end deffn
+
+@deffn {Scheme Procedure} page-file-name @var{page}
+Return the file name string for @var{page}.
+@end deffn
+
+@deffn {Scheme Procedure} page-contents @var{page}
+Return the contents of @var{page}.
+@end deffn
+
+@deffn {Scheme Procedure} page-writer @var{page}
+Return the writer procedure @var{page}.
+@end deffn
+
+@deffn {Scheme Procedure} write-page @var{page} @var{output-directory}
+Write @var{page} to @var{output-directory}.
+@end deffn
+
 @node Assets
 @section Assets
+
+@example
+(use-modules (haunt asset))
+@end example
+
+Assets represent files on disk that should be copied verbatim to a
+site's output directory.  Common types of assets include CSS,
+JavaScript, images, and fonts.
+
+@deffn {Scheme Procedure} make-asset @var{source} @var{target}
+Create a new asset object.  The @var{source} and @var{target}
+arguments are file names that are relative to a site source and target
+directory, respectively (@pxref{Sites}).
+@end deffn
+
+@deffn {Scheme Procedure} asset? @var{object}
+Return @code{#t} if @var{object} is an asset object.
+@end deffn
+
+@deffn {Scheme Procedure} asset-source @var{asset}
+Return the source file name for @var{asset}.
+@end deffn
+
+@deffn {Scheme Procedure} asset-target @var{asset}
+Return the target file name for @var{asset}.
+@end deffn
+
+@deffn {Scheme Procedure} install-asset @var{asset} @var{prefix}
+Install the source file of @var{asset} into the target directory
+within @var{prefix}.
+@end deffn
+
+@deffn {Scheme Procedure} directory-assets @var{directory} @var{keep?} @var{dest}
+Create a list of asset objects to be stored within @var{dest} for all
+files in @var{directory} that match @var{keep?}, recursively.
+@end deffn
+
+@node Builders
+@section Builders
+
+@menu
+* Static Assets::              Images, CSS, JavaScript, etc.
+* Blog::                       Dear diary...
+* Atom::                       Atom feeds.
+@end menu
+
+Builders are procedures that return one or more page objects
+(@pxref{Pages}) when applied.  A builder accepts two arguments: A site
+(@pxref{Sites} and a list of posts (@pxref{Posts}).
+
+Haunt comes with a few convenient builders to help users who want to
+create a simple blog with an Atom feed.
+
+@node Static Assets
+@subsection Static Assets
+
+@example
+(use-modules (haunt builder assets))
+@end example
+
+@deffn {Scheme Procedure} static-directory @var{directory} @
+       [@var{dest} @var{directory}]
+
+Create a builder procedure that recursively copies all of the files in
+@var{directory}, a file names relative to a site's source directory,
+and copies them into @var{dest}, a prefix relative to a site's target
+output directory.  By default, @var{dest} is @var{directory}.
+@end deffn
+
+@node Blog
+@subsection Blog
+
+@example
+(use-modules (haunt builder blog))
+@end example
+
+@deffn {Scheme Procedure} theme [#:name #:layout #:post-template #:collection-template]
+Create a new theme named @var{name}.
+
+The procedure @var{layout} accepts three arguments: a site, a page
+title string, and an SXML tree.  Its purpose is to wrap the contents
+of a post with the theme's header/footer and return the complete SXML
+tree for a web page.
+
+The procedure @var{post-template} accepts a single argument: a post.
+Its purpose is to return an SXML tree containing the contents of the
+post, applying any desired post-processing operations.  The values
+returned from this procedure will be wrapped in the theme's layout.
+
+The procedure @var{collection-template} accepts four arguments: a
+site, a title string, a list of posts, and a URL prefix string.  Its
+purpose is to return an SXML tree containing the body of the
+collection page.  The values returned from this procedure will be
+wrapped in the theme's layout.
+@end deffn
+
+@deffn {Scheme Procedure} theme? @var{object}
+Return @code{#t} if @var{object} is a theme object.
+@end deffn
+
+@deffn {Scheme Procedure} blog [#:theme #:prefix #:collections]
+Create a builder procedure that transforms a list of posts into pages
+decorated by @var{theme}, a theme object, whose URLs start with
+@var{prefix}.
+
+Additionally, this builder creates pages that aggregate previews of
+many posts corresponding to what is specified in the list
+@var{collections}.  Each collection is a three element list in the
+form @code{(title file-name filter)}.
+
+@table @var
+
+@item title
+The human readable name of the collection.
+
+@item file-name
+The HTML file that will contain the rendered collection.
+
+@item filter
+A procedure that accepts a list of posts as its only argument and
+returns a new list of posts.  The filter procedure is used to remove
+and/or sort the posts into the desired form for the collection.  For
+example, a filter could sort posts in reverse chronological order or
+select all posts that are written by a particular author.
+
+@end table
+
+By default, a single collection is created that lists posts in reverse
+chronological order and writes to @file{index.html}.
+
+The default theme is intended only for testing purposes.
+
+@end deffn
+
+@node Atom
+@subsection Atom
+
+@example
+(use-modules (haunt builder atom))
+@end example
+
+@deffn {Scheme Procedure} atom-feed [#:file-name #:subtitle #:filter #:max-entries #:blog-prefix]
+Return a builder procedure that renders a site's posts as an Atom
+feed.  All arguments are optional:
+
+@table @var
+
+@item file-name:
+The page file name.  The default is @file{feed.xml}.
+
+@item subtitle
+The feed subtitle.  The default is ``Recent Posts''.
+
+@item filter
+The procedure called to manipulate the posts list before rendering.
+The default is to keep all posts and sort them in reverse
+chronological order.
+
+@item max-entries
+The maximum number of posts to render in the feed.  The default is 20.
+@end table
+
+@end deffn
+
+@deffn {Scheme Procedure} atom-feeds-by-tag [#:prefix #:filter #:max-entries #:blog-prefix]
+Return a builder procedure that renders an atom feed for every tag
+used in a post.  All arguments are optional:
+
+@table @var
+
+@item prefix
+The directory in which to write the feeds.  The default is
+@file{feeds/tags}.
+
+@item filter
+The procedure called to manipulate the posts list before rendering.
+The default is to keep all posts and sort them in reverse
+chronological order.
+
+@item max-entries
+The maximum number of posts to render in each feed.  The default is
+20.
+
+@end table
+
+@end deffn
 
 @node Contributing
 @chapter Contributing
