@@ -98,6 +98,7 @@
                            (ul
                             (li ,(anchor "home" "/"))
                             (li ,(anchor "downloads" "/downloads.html"))
+                            (li ,(anchor "docs" "/manual/index.html"))
                             (li ,(anchor "git"
                                          "https://git.dthompson.us/haunt.git")))))
               (div (@ (class "container"))
@@ -223,4 +224,5 @@ the official git repository:")
                        downloads-page
                        (static-directory "images")
                        (static-directory "css")
-                       (static-directory "js")))
+                       (static-directory "js")
+                       (static-directory "manual")))
