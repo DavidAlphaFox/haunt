@@ -40,15 +40,15 @@
 
 (package
   (name "haunt")
-  (version "0.1")
+  (version "0.2")
   (source (origin
             (method git-fetch)
             (uri (git-reference
                   (url "git://dthompson.us/haunt.git")
-                  (commit "1ddcff3")))
+                  (commit "f0a7c2b14a201448432d3564d851ee0686d5b1b1")))
             (sha256
              (base32
-              "0gx1ijbz9k0lcgmv82x49nam1i7r16sqx5v8hbpafkiqyxkm2v1k"))))
+              "1dnzsw18blhr8admw48zbl3ilz3iiqmb149i37y820h0imqfli0v"))))
   (build-system gnu-build-system)
   (arguments
    '(#:phases
