@@ -25,6 +25,9 @@ and blog builders, and bug fixes.])
         (li (anchor "serve: Catch exceptions when rebuilding site."
                     "https://git.dthompson.us/haunt.git/commit/0d67128c3da6413546015fa9092a0017f50d46b9"))))
 
+ (p [A special thank you to Christopher Webber and Mathieu Lirzin for
+contributing to this release!])
+
  (p [Source tarball: ]
     (anchor "haunt-0.2.tar.gz"
             "https://files.dthompson.us/haunt/haunt-0.2.tar.gz"))
