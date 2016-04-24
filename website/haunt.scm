@@ -1,5 +1,5 @@
 ;;; Haunt --- Static site generator for GNU Guile
-;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2016 David Thompson <davet@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -18,6 +18,7 @@
 
 (use-modules (haunt site)
              (haunt reader)
+             (haunt reader skribe)
              (haunt asset)
              (haunt page)
              (haunt post)
@@ -32,15 +33,20 @@
              (web uri))
 
 (define %releases
-  '(("0.1" "c81dbcdf33f9b0a19442d3701cffa3b60c8891ce")))
+  '(("0.2" #t)
+    ("0.1" #f)))
 
 (define (tarball-url version)
   (string-append "http://files.dthompson.us/haunt/haunt-"
                  version ".tar.gz"))
 
+(define (tarball-signature-url version)
+  (string-append "http://files.dthompson.us/haunt/haunt-"
+                 version ".tar.gz.sig"))
+
 (define %download-button
   (match %releases
-    (((version sha1) . _)
+    (((version _) . _)
      `(a (@ (class "btn btn-primary btn-lg")
             (role "button")
             (href ,(tarball-url version)))
@@ -97,7 +103,7 @@
               (div (@ (class "container"))
                    ,body
                    (footer (@ (class "text-center"))
-                    (p (small "Copyright © 2015 David Thompson"))
+                    (p (small "Copyright © 2016 David Thompson"))
                     (p
                      (small "The text and images on this site are free
 culture works available under the " ,%cc-by-sa-link " license.")))))))
@@ -182,21 +188,20 @@ the official git repository:")
 
 (define (downloads-page site posts)
   (define body
-    `(,(jumbotron
-        `(,%download-button
-          (p (small "SHA1 checksum: "
-                    ,(match %releases (((_ sha1) . _) sha1))))))
-      (h2 "Downloads")
+    `((h2 "Downloads")
       (table (@ (class "table"))
        (thead
-        (tr (th "Source") (th "SHA1")))
+        (tr (th "Source") (th "GPG signature")))
        (tbody
         ,(map (match-lambda
-               ((version sha1)
-                `(tr
-                  (td (a (@ (href ,(tarball-url version)))
-                         ,(string-append "haunt-" version ".tar.gz")))
-                  (td ,sha1))))
+               ((version signature?)
+                (let ((tarball-name (string-append "haunt-" version ".tar.gz")))
+                  `(tr
+                    (td (a (@ (href ,(tarball-url version))) ,tarball-name))
+                    (td ,(if signature?
+                             `(a (@ (href ,(tarball-signature-url version)))
+                                 ,(string-append tarball-name ".sig"))
+                             ""))))))
               %releases)))))
 
   (make-page "downloads.html"
@@ -211,7 +216,7 @@ the official git repository:")
       #:default-metadata
       '((author . "David Thompson")
         (email  . "davet@gnu.org"))
-      #:readers (list sxml-reader html-reader)
+      #:readers (list sxml-reader skribe-reader)
       #:builders (list (blog #:theme haunt-theme #:collections %collections)
                        (atom-feed)
                        (atom-feeds-by-tag)
