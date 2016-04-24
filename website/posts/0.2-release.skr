@@ -31,7 +31,7 @@ contributing to this release!])
  (p [Source tarball: ]
     (anchor "haunt-0.2.tar.gz"
             "https://files.dthompson.us/haunt/haunt-0.2.tar.gz"))
- (p [GPG Signature: ]
+ (p [GPG signature: ]
     (anchor "haunt-0.2.tar.gz.sig"
             "https://files.dthompson.us/haunt/haunt-0.2.tar.gz.sig"))
 
