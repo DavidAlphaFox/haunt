@@ -30,7 +30,6 @@ nobase_go_DATA = $(GOBJECTS)
 guile_install_go_files = install-nobase_goDATA
 $(guile_install_go_files): install-nobase_modDATA
 
-CLEANFILES = $(GOBJECTS)
 EXTRA_DIST = $(SOURCES) $(NOCOMP_SOURCES)
 GUILE_WARNINGS = -Wunbound-variable -Warity-mismatch -Wformat
 SUFFIXES = .scm .go
@@ -86,8 +85,13 @@ dvi: # Don't build dvi docs
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   README					\
-  guix.scm
+  guix.scm					\
+  $(TESTS)
 
 SUBDIRS =					\
   example					\
   website
+
+CLEANFILES =					\
+  $(GOBJECTS)					\
+  $(TESTS:tests/%.scm=%.log)
