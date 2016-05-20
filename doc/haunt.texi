@@ -543,7 +543,7 @@ Return @code{#t} if @var{object} is a reader.
 Return the match procedure for @var{reader}.
 @end deffn
 
-@deffn {Scheme Procedure} reader-matcher @var{reader}
+@deffn {Scheme Procedure} reader-proc @var{reader}
 Return the read procedure for @var{reader}.
 @end deffn
 
