@@ -502,7 +502,7 @@ The default date of a post when no other date is specified in the
 metadata association list.
 @end defvr
 
-@deffn {Scheme Procedure} post-data @var{post}
+@deffn {Scheme Procedure} post-date @var{post}
 Return the date for @var{post}, or @code{%default-date} if no date is
 specified.
 @end deffn
