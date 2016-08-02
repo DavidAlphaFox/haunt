@@ -18,4 +18,7 @@ dnl Guile-reader is needed for Skribe support
 GUILE_MODULE_AVAILABLE([have_guile_reader], [(system reader)])
 AM_CONDITIONAL([HAVE_GUILE_READER], [test "x$have_guile_reader" = "xyes"])
 
+GUILE_MODULE_AVAILABLE([have_guile_commonmark], [(commonmark)])
+AM_CONDITIONAL([HAVE_GUILE_COMMONMARK], [test "x$have_guile_commonmark" = "xyes"])
+
 AC_OUTPUT

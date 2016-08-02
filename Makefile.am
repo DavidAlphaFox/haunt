@@ -1,6 +1,7 @@
 ## Haunt --- Static site generator for GNU Guile
 ## Copyright © 2015 David Thompson <davet@gnu.org>
 ## Copyright © 2015 Mathieu Lirzin <mthl@gnu.org>
+## Copyright © 2016 Erik Edrosa <erik.edrosa@gmail.com>
 ##
 ## This file is part of Haunt.
 ##
@@ -67,6 +68,13 @@ SOURCES +=					\
   haunt/skribe.scm				\
   haunt/skribe/utils.scm			\
   haunt/reader/skribe.scm
+
+endif
+
+if HAVE_GUILE_COMMONMARK
+
+SOURCES +=					\
+  haunt/reader/commonmark.scm
 
 endif
 
