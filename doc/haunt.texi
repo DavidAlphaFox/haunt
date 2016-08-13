@@ -165,6 +165,9 @@ The following dependencies are optional:
 @item
 @url{http://www.nongnu.org/guile-reader/, Guile-Reader} version 0.6 or
 later (for Skribe support)
+@item
+@url{https://github.com/OrangeShark/guile-commonmark, guile-commonmark}
+version 0.1 or later (for CommonMark support)
 @end itemize
 
 @node Building
