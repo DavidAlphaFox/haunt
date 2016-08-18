@@ -63,7 +63,8 @@
   (inputs
    `(("guile" ,guile-2.0)))
   (propagated-inputs
-   `(("guile-reader" ,guile-reader)))
+   `(("guile-commonmark" ,guile-commonmark)
+     ("guile-reader" ,guile-reader)))
   (synopsis "Functional static site generator")
   (description "Haunt is a static site generator written in Guile
 Scheme.  Haunt features a functional build system and an extensible
