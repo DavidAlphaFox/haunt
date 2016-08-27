@@ -522,6 +522,15 @@ Create an association list of tags mapped to the posts in the list
 @node Readers
 @section Readers
 
+@menu
+* Reader::                      Reader interface and basic readers
+* Texinfo::                     Texinfo reader
+* Skribe::                      Skribe reader
+* CommonMark::                  CommonMark reader
+@end menu
+
+@node Reader
+@subsection Reader
 @example
 (use-modules (haunt reader))
 @end example
@@ -610,6 +619,98 @@ tags: bar
   This is an example using raw HTML, because Guile doesn't have a
   Markdown parser.
 </p>
+@end example
+
+@end defvr
+
+@node Texinfo
+@subsection Texinfo
+@example
+(use-modules (haunt reader texinfo))
+@end example
+
+@defvr {Scheme Procedure} texinfo-reader
+A reader for posts written in texinfo, the official documentation format
+of the GNU project.  Metadata is encoded as @code{key: value} pairs, one
+per line, at the beginning of the file.  A line with the @code{---}
+sentinel marks the end of the metadata section and the rest of the file
+is encoded as HTML.
+
+Example:
+
+@example
+title: Hello, Texi!
+date: 2016-08-20 12:00
+tags: texinfo, foo
+---
+
+@@emph@{Texinfo@} is the official documentation format of the
+@@url@{http://www.gnu.org/, GNU project@}.  It was invented by Richard
+Stallman and Bob Chassell many years ago, loosely based on Brian
+Reid's Scribe and other formatting languages of the time.  It is
+used by many non-GNU projects as well.
+@end example
+
+@end defvr
+
+@node Skribe
+@subsection Skribe
+@example
+(use-modules (haunt reader skribe))
+@end example
+
+@defvr {Scheme Procedure} skribe-reader
+A reader for posts written in Skribe, a markup language with the full power
+of Scheme.  Skribe posts are created with the @code{post} expression with
+metadata encoded as @code{:key expression} pairs at the beginning of the
+@code{post} expression.  After the metadata section, the rest of the @code{post}
+expression is encoded as HTML.
+
+Example:
+
+@example
+(post
+ :title "Hello, Skribe!"
+ :date (make-date* 2016 08 20 12 00)
+ :tags '("skribe" "foo" "baz")
+
+ (h2 [This is a Skribe post])
+
+ (p [Skribe is a ,(em [really]) cool document authoring format
+     that provides all the power of Scheme whilst giving the user
+     a means to write literal text without stuffing it into a
+     string literal. If this sort of thing suits you, be sure to
+     check out ,(anchor "Skribilo"
+                        "http://www.nongnu.org/skribilo/"), too.]))
+@end example
+
+@end defvr
+
+@node CommonMark
+@subsection CommonMark
+@example
+(use-modules (haunt reader commonmark))
+@end example
+
+@defvr {Scheme Procedure} commonmark-reader
+A reader for posts written in CommonMark, a fully specified variant of
+Markdown.  Metadata is encoded as @code{key: value} pairs, one per line,
+at the beginning of the file.  A line with the @code{---} sentinel marks
+the end of the metadata section and the rest of the file is encoded as HTML.
+
+Example:
+
+@example
+title: Hello, CommonMark!
+date: 2016-08-20 12:00
+tags: markdown, commonmark
+---
+
+## This is a CommonMark post
+
+CommonMark is a **strongly** defined, *highly* compatible
+specification of Markdown, learn more about CommomMark
+[here](http://commonmark.org/).
 @end example
 
 @end defvr
