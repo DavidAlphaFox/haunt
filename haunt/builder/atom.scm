@@ -79,7 +79,8 @@ MAX-ENTRIES: The maximum number of posts to render in the feed"
                       (title ,(site-title site))
                       (subtitle ,subtitle)
                       (updated ,(date->string* (current-date)))
-                      (link (@ (href ,(string-append "/" file-name))
+                      (link (@ (href ,(string-append (site-domain site)
+                                                     "/" file-name))
                                (rel "self")))
                       (link (@ (href ,(site-domain site))))
                       ,@(map (cut post->atom-entry site <>
