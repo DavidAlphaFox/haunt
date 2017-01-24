@@ -11,10 +11,10 @@ copy of the license is included in the section entitled "GNU Free
 Documentation License". -->
 <!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>Haunt Reference Manual: Building</title>
+<title>Haunt Reference Manual: CommonMark</title>
 
-<meta name="description" content="Haunt Reference Manual: Building">
-<meta name="keywords" content="Haunt Reference Manual: Building">
+<meta name="description" content="Haunt Reference Manual: CommonMark">
+<meta name="keywords" content="Haunt Reference Manual: CommonMark">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
@@ -22,9 +22,9 @@ Documentation License". -->
 <link href="index.html#Top" rel="start" title="Top">
 <link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Installation.html#Installation" rel="up" title="Installation">
-<link href="Tutorial.html#Tutorial" rel="next" title="Tutorial">
-<link href="Requirements.html#Requirements" rel="prev" title="Requirements">
+<link href="Readers.html#Readers" rel="up" title="Readers">
+<link href="Pages.html#Pages" rel="next" title="Pages">
+<link href="Skribe.html#Skribe" rel="prev" title="Skribe">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
@@ -57,23 +57,41 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Building"></a>
+<a name="CommonMark"></a>
 <div class="header">
 <p>
-Previous: <a href="Requirements.html#Requirements" accesskey="p" rel="prev">Requirements</a>, Up: <a href="Installation.html#Installation" accesskey="u" rel="up">Installation</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Skribe.html#Skribe" accesskey="p" rel="prev">Skribe</a>, Up: <a href="Readers.html#Readers" accesskey="u" rel="up">Readers</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Building-1"></a>
-<h3 class="section">2.3 Building</h3>
+<a name="CommonMark-1"></a>
+<h4 class="subsection">5.3.4 CommonMark</h4>
+<div class="example">
+<pre class="example">(use-modules (haunt reader commonmark))
+</pre></div>
 
-<p>Haunt uses the standard GNU build system, so the basic installation
-procedure looks like this:
+<dl>
+<dt><a name="index-commonmark_002dreader"></a>Scheme Procedure: <strong>commonmark-reader</strong></dt>
+<dd><p>A reader for posts written in CommonMark, a fully specified variant of
+Markdown.  Metadata is encoded as <code>key: value</code> pairs, one per line,
+at the beginning of the file.  A line with the <code>---</code> sentinel marks
+the end of the metadata section and the rest of the file is encoded as HTML.
+</p>
+<p>Example:
 </p>
 <div class="example">
-<pre class="example">./configure
-make
-make install
+<pre class="example">title: Hello, CommonMark!
+date: 2016-08-20 12:00
+tags: markdown, commonmark
+---
+
+## This is a CommonMark post
+
+CommonMark is a **strongly** defined, *highly* compatible
+specification of Markdown, learn more about CommomMark
+[here](http://commonmark.org/).
 </pre></div>
+
+</dd></dl>
 
 
 
