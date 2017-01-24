@@ -76,7 +76,8 @@
   (take-up-to 2 '(1 2 3)))
 
 (test-equal "string->date*"
-  (make-date 0 0 15 06 05 09 2015 (date-zone-offset (current-date)))
+  (make-date 0 0 15 06 05 09 2015
+             (date-zone-offset (string->date "2015-09-05" "~Y~m~d")))
   (string->date* "2015-09-05 06:15"))
 
 (test-end)

@@ -26,7 +26,8 @@
 (define (make-date* year month day)
   (make-date 0 0 0 0 day month year 0))
 
-(define %tzoffset (date-zone-offset (current-date)))
+(define %tzoffset
+  (date-zone-offset (string->date "2015-09-05" "~Y~m~d")))
 
 (test-equal "post-ref"
   '(hello test)
