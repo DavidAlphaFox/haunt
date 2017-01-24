@@ -19,6 +19,7 @@
 (use-modules (haunt site)
              (haunt reader)
              (haunt reader skribe)
+             (haunt reader commonmark)
              (haunt asset)
              (haunt page)
              (haunt post)
@@ -33,7 +34,8 @@
              (web uri))
 
 (define %releases
-  '(("0.2" #t)
+  '(("0.2.1" #t)
+    ("0.2" #t)
     ("0.1" #f)))
 
 (define (tarball-url version)
@@ -217,7 +219,7 @@ the official git repository:")
       #:default-metadata
       '((author . "David Thompson")
         (email  . "davet@gnu.org"))
-      #:readers (list sxml-reader skribe-reader)
+      #:readers (list sxml-reader skribe-reader commonmark-reader)
       #:builders (list (blog #:theme haunt-theme #:collections %collections)
                        (atom-feed)
                        (atom-feeds-by-tag)
