@@ -140,4 +140,4 @@ site."
                      (string-prefix? (string-append cwd "/" build-dir) dir))))
                 (site-file-filter site)))))
 
-    (serve doc-root)))
+    (serve doc-root #:open-params `(#:port ,port))))
