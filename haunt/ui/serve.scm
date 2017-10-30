@@ -28,6 +28,7 @@
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
   #:use-module (ice-9 ftw)
+  #:use-module (ice-9 threads)
   #:use-module (haunt site)
   #:use-module (haunt config)
   #:use-module (haunt ui)
