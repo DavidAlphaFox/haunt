@@ -57,7 +57,6 @@
   (alist->hash-table
    '((#\" . "quot")
      (#\& . "amp")
-     (#\' . "apos")
      (#\< . "lt")
      (#\> . "gt"))))
 
