@@ -539,16 +539,10 @@
      ("vrml" . x-world/x-vrml)
      ("wrl" . x-world/x-vrml))))
 
-(define %file-ext-regexp
-  (make-regexp "(\\.(.*)|[~%])$"))
-
-(define (file-extension file-name)
-  "Return the file extension for FILE-NAME, or #f if one is not
-found."
-  (and=> (regexp-exec %file-ext-regexp file-name)
-         (lambda (match)
-           (or (match:substring match 2)
-               (match:substring match 1)))))
+(define (file-extension file)
+  "Return the extension of FILE or #f if there is none."
+  (let ((dot (string-rindex file #\.)))
+    (and dot (substring file (+ 1 dot) (string-length file)))))
 
 (define (mime-type file-name)
   "Guess the MIME type for FILE-NAME based upon its file extension."
