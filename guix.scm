@@ -61,7 +61,7 @@
      ("pkg-config" ,pkg-config)
      ("texinfo" ,texinfo)))
   (inputs
-   `(("guile" ,guile-2.0)))
+   `(("guile" ,guile-2.2)))
   (propagated-inputs
    `(("guile-commonmark" ,guile-commonmark)
      ("guile-reader" ,guile-reader)))
