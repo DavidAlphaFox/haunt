@@ -144,9 +144,9 @@ Happy haunting!
 @node Downloading
 @section Downloading
 
-Official Haunt source code release tarballs can be found on the
-@url{http://haunt.dthompson.us/downloads.html, downloads page} of
-Haunt's website, along with their associated checksums.
+Official Haunt source code release tarballs can be found under Releases
+in @url{https://dthompson.us/projects/haunt.html, Haunt's website},
+along with their associated checksums.
 
 @node Requirements
 @section Requirements
