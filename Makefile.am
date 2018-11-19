@@ -54,6 +54,7 @@ SOURCES =					\
   haunt/builder/assets.scm			\
   haunt/builder/atom.scm			\
   haunt/builder/blog.scm			\
+  haunt/builder/rss.scm				\
   haunt/reader.scm				\
   haunt/reader/texinfo.scm			\
   haunt/ui.scm					\
