@@ -36,6 +36,7 @@
             post-sxml
             post-metadata
             post-ref
+            post-ref-all
             post-slug
             %default-date
             post-date
@@ -56,6 +57,13 @@
 (define (post-ref post key)
   "Return the metadata corresponding to KEY within POST."
   (assq-ref (post-metadata post) key))
+
+(define (post-ref-all post key)
+  "Return a list of all metadata values for KEY within POST."
+  (filter-map (match-lambda
+                ((k . v)
+                 (and (eq? key k) v)))
+              (post-metadata post)))
 
 (define char-set:slug
   (char-set-union char-set:letter+digit (char-set #\-)))
