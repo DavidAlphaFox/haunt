@@ -42,7 +42,7 @@
             posts/reverse-chronological
             posts/group-by-tag
 
-            register-metdata-parser!
+            register-metadata-parser!
             parse-metadata
             read-metadata-headers))
 
