@@ -24,6 +24,7 @@
 ;;; Code:
 
 (define-module (haunt builder atom)
+  #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
@@ -33,8 +34,97 @@
   #:use-module (haunt page)
   #:use-module (haunt utils)
   #:use-module (haunt html)
-  #:export (atom-feed
+  #:use-module (haunt serve mime-types)
+  #:export (make-enclosure
+            enclosure?
+            enclosure-title
+            enclosure-url
+            enclosure-extra
+            enclosure-mime-type
+
+            atom-feed
             atom-feeds-by-tag))
+
+(define-record-type <enclosure>
+  (make-enclosure title url extra)
+  enclosure?
+  (title enclosure-title)
+  (url enclosure-url)
+  (extra enclosure-extra))
+
+(define (enclosure-mime-type enclosure)
+  (mime-type (enclosure-url enclosure)))
+
+(define char-set:enclosure-key
+  (char-set-union char-set:letter+digit
+                  (char-set-delete char-set:punctuation #\: #\")
+                  (char-set-delete char-set:symbol #\=)))
+
+(define (parse-enclosure s)
+  (call-with-input-string s
+    (lambda (port)
+      (define (assert-char char)
+        (let ((c (read-char port)))
+          (unless (eqv? c char)
+            (error "enclosure: parse: expected" char "got" c))))
+      (define (whitespace? char)
+        (char-set-contains? char-set:whitespace char))
+      (define (consume-whitespace)
+        (match (peek-char port)
+          ((? eof-object?) *unspecified*)
+          ((? whitespace?)
+           (read-char port)
+           (consume-whitespace))
+          (_ *unspecified*)))
+      (define (read-escape-character)
+        (match (read-char port)
+          (#\" #\")
+          (#\\ #\\)
+          (char (error "enclosure: parse: invalid escape character:" char))))
+      (define (read-unquoted-string)
+        (list->string
+         (let loop ()
+           (let ((c (peek-char port)))
+             (cond
+              ((eof-object? c)
+               '())
+              ((char-set-contains? char-set:enclosure-key c)
+               (read-char port)
+               (cons c (loop)))
+              (else
+               '()))))))
+      (define (read-string)
+        (if (eqv? (peek-char port) #\")
+            (begin
+              (assert-char #\")
+              (list->string
+               (let loop ()
+                 (match (read-char port)
+                   ((? eof-object?)
+                    (error "enclosure: parse: EOF while reading string"))
+                   (#\" '())
+                   (#\\ (cons (read-escape-character) (loop)))
+                   (char (cons char (loop)))))))
+            (read-unquoted-string)))
+      (define (read-key)
+        (string->symbol (read-unquoted-string)))
+      (let loop ((attrs '()))
+        (consume-whitespace)
+        (if (eof-object? (peek-char port))
+            (make-enclosure (assq-ref attrs 'title)
+                            (assq-ref attrs 'url)
+                            (let loop ((attrs attrs))
+                              (match attrs
+                                (() '())
+                                ((((or 'title 'url) . _) . rest)
+                                 (loop rest))
+                                ((attr . rest)
+                                 (cons attr (loop rest))))))
+            (let ((key (read-key)))
+              (assert-char #\:)
+              (loop (cons (cons key (read-string)) attrs))))))))
+
+(register-metadata-parser! 'enclosure parse-enclosure)
 
 (define (sxml->xml* sxml port)
   "Write SXML to PORT, preceded by an <?xml> tag."
@@ -58,7 +148,17 @@
                                    (site-post-slug site post) ".html"))
              (rel "alternate")))
     (summary (@ (type "html"))
-             ,(sxml->html-string (post-sxml post)))))
+             ,(sxml->html-string (post-sxml post)))
+    ,@(map (lambda (enclosure)
+             `(link (@ (rel "enclosure")
+                       (title ,(enclosure-title enclosure))
+                       (url ,(enclosure-url enclosure))
+                       (type ,(enclosure-mime-type enclosure))
+                       ,@(map (match-lambda
+                                ((key . value)
+                                 (list key value)))
+                              (enclosure-extra enclosure)))))
+           (post-ref-all post 'enclosure))))
 
 (define* (atom-feed #:key
                     (file-name "feed.xml")
