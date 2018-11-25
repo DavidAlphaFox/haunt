@@ -13,6 +13,7 @@ Makefile.in
 /example/site/
 /scripts/haunt
 *.tar.gz
+*.tar.gz.asc
 /website/site
 /test-env
 *.log
