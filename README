@@ -5,7 +5,7 @@ simple, functional, and extensible.
 
 * Features
 
-  - Easy blog and Atom feed generation
+  - Easy blog and Atom/RSS feed generation
   - Supports any markup language that can be parsed to SXML
   - Simple development server
   - Purely functional build process
