@@ -152,7 +152,7 @@
     ,@(map (lambda (enclosure)
              `(link (@ (rel "enclosure")
                        (title ,(enclosure-title enclosure))
-                       (url ,(enclosure-url enclosure))
+                       (href ,(enclosure-url enclosure))
                        (type ,(enclosure-mime-type enclosure))
                        ,@(map (match-lambda
                                 ((key . value)
