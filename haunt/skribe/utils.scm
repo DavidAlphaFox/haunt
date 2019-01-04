@@ -29,7 +29,9 @@
   #:export (post
 
             p blockquote em
-            h1 h2 h3 h4
+            h1 h2 h3 h4 h5 h6
+	    section
+	    nav aside
             code pre strong
             ul ol li dl dt dd
             anchor
@@ -60,7 +62,9 @@ contents from METADATA+SXML."
   em strong
   code samp pre kbd var
   cite dfn abbr
-  h1 h2 h3 h4
+  h1 h2 h3 h4 h5 h6
+  section
+  nav aside
   ul ol li dl dt dd)
 
 (define (anchor text uri)
