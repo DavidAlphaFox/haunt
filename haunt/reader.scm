@@ -105,8 +105,17 @@ post."
 
 (define (read-html-post port)
   (values (read-metadata-headers port)
-          (match (xml->sxml port)
-            (('*TOP* sxml) sxml))))
+          (let loop ()
+            (let ((next-char (peek-char port)))
+              (cond
+               ((eof-object? next-char)
+                '())
+               ((char-set-contains? char-set:whitespace next-char)
+                (read-char port)
+                (loop))
+               (else
+                (match (xml->sxml port)
+                  (('*TOP* sxml) (cons sxml (loop))))))))))
 
 (define html-reader
   (make-reader (make-file-extension-matcher "html")
