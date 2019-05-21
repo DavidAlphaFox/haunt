@@ -11,7 +11,7 @@ AC_CONFIG_FILES([pre-inst-env], [chmod +x pre-inst-env])
 AC_CONFIG_FILES([test-env], [chmod +x test-env])
 AC_CONFIG_FILES([scripts/haunt], [chmod +x scripts/haunt])
 
-GUILE_PKG([2.2 2.0])
+GUILE_PKG([3.0 2.2 2.0])
 GUILE_PROGS
 
 dnl Guile-reader is needed for Skribe support
