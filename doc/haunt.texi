@@ -803,7 +803,7 @@ files in @var{directory} that match @var{keep?}, recursively.
 
 Builders are procedures that return one or more page objects
 (@pxref{Pages}) when applied.  A builder accepts two arguments: A site
-(@pxref{Sites} and a list of posts (@pxref{Posts}).
+(@pxref{Sites}) and a list of posts (@pxref{Posts}).
 
 Haunt comes with a few convenient builders to help users who want to
 create a simple blog with an Atom feed.
