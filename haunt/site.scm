@@ -37,6 +37,7 @@
             site?
             site-title
             site-domain
+            site-scheme
             site-posts-directory
             site-file-filter
             site-build-directory
@@ -51,11 +52,12 @@
             default-file-filter))
 
 (define-record-type <site>
-  (make-site title domain posts-directory file-filter build-directory
+  (make-site title domain scheme posts-directory file-filter build-directory
              default-metadata make-slug readers builders)
   site?
   (title site-title)
   (domain site-domain)
+  (scheme site-scheme) ; https or http
   (posts-directory site-posts-directory)
   (file-filter site-file-filter)
   (build-directory site-build-directory)
@@ -67,6 +69,7 @@
 (define* (site #:key
                (title "This Place is Haunted")
                (domain "example.com")
+               (scheme 'https)
                (posts-directory "posts")
                (file-filter default-file-filter)
                (build-directory "site")
@@ -77,6 +80,8 @@
   "Create a new site object.  All arguments are optional:
 
 TITLE: The name of the site
+DOMAIN: The domain that will host the site
+SCHEME: Either 'https' or 'http' ('https' by default)
 POSTS-DIRECTORY: The directory where posts are found
 FILE-FILTER: A predicate procedure that returns #f when a post file
 should be ignored, and #f otherwise.  Emacs temp files are ignored by
@@ -87,7 +92,7 @@ whose keys are symbols
 MAKE-SLUG: A procedure generating a file name slug from a post
 READERS: A list of reader objects for processing posts
 BUILDERS: A list of procedures for building pages from posts"
-  (make-site title domain posts-directory file-filter build-directory
+  (make-site title domain scheme posts-directory file-filter build-directory
              default-metadata make-slug readers builders))
 
 (define (site-post-slug site post)
