@@ -35,6 +35,7 @@
   #:use-module (haunt utils)
   #:use-module (haunt html)
   #:use-module (haunt serve mime-types)
+  #:use-module (web uri)
   #:export (make-enclosure
             enclosure?
             enclosure-title
@@ -137,28 +138,33 @@
 
 (define* (post->atom-entry site post #:key (blog-prefix ""))
   "Convert POST into an Atom <entry> XML node."
-  `(entry
-    (title ,(post-ref post 'title))
-    (author
-     (name ,(post-ref post 'author))
-     ,(let ((email (post-ref post 'email)))
-        (if email `(email ,email) '())))
-    (updated ,(date->string* (post-date post)))
-    (link (@ (href ,(string-append blog-prefix "/"
-                                   (site-post-slug site post) ".html"))
-             (rel "alternate")))
-    (summary (@ (type "html"))
-             ,(sxml->html-string (post-sxml post)))
-    ,@(map (lambda (enclosure)
-             `(link (@ (rel "enclosure")
-                       (title ,(enclosure-title enclosure))
-                       (href ,(enclosure-url enclosure))
-                       (type ,(enclosure-mime-type enclosure))
-                       ,@(map (match-lambda
-                                ((key . value)
-                                 (list key value)))
-                              (enclosure-extra enclosure)))))
-           (post-ref-all post 'enclosure))))
+  (let ((uri (uri->string
+              (build-uri (site-scheme site)
+                         #:host (site-domain site)
+                         #:path (string-append blog-prefix "/"
+                                               (site-post-slug site post)
+                                               ".html")))))
+    `(entry
+      (title ,(post-ref post 'title))
+      (id ,uri)
+      (author
+       (name ,(post-ref post 'author))
+       ,(let ((email (post-ref post 'email)))
+          (if email `(email ,email) '())))
+      (updated ,(date->string* (post-date post)))
+      (link (@ (href ,uri) (rel "alternate")))
+      (summary (@ (type "html"))
+               ,(sxml->html-string (post-sxml post)))
+      ,@(map (lambda (enclosure)
+               `(link (@ (rel "enclosure")
+                         (title ,(enclosure-title enclosure))
+                         (href ,(enclosure-url enclosure))
+                         (type ,(enclosure-mime-type enclosure))
+                         ,@(map (match-lambda
+                                  ((key . value)
+                                   (list key value)))
+                                (enclosure-extra enclosure)))))
+             (post-ref-all post 'enclosure)))))
 
 (define* (atom-feed #:key
                     (file-name "feed.xml")
@@ -174,19 +180,24 @@ SUBTITLE: The feed subtitle
 FILTER: The procedure called to manipulate the posts list before rendering
 MAX-ENTRIES: The maximum number of posts to render in the feed"
   (lambda (site posts)
-    (make-page file-name
-               `(feed (@ (xmlns "http://www.w3.org/2005/Atom"))
-                      (title ,(site-title site))
-                      (subtitle ,subtitle)
-                      (updated ,(date->string* (current-date)))
-                      (link (@ (href ,(string-append (site-domain site)
-                                                     "/" file-name))
-                               (rel "self")))
-                      (link (@ (href ,(site-domain site))))
-                      ,@(map (cut post->atom-entry site <>
-                                  #:blog-prefix blog-prefix)
-                             (take-up-to max-entries (filter posts))))
-               sxml->xml*)))
+    (let ((uri (uri->string
+                (build-uri (site-scheme site)
+                           #:host (site-domain site)
+                           #:path (string-append "/" file-name)))))
+      (make-page file-name
+                 `(feed (@ (xmlns "http://www.w3.org/2005/Atom"))
+                        (title ,(site-title site))
+                        (id ,uri)
+                        (subtitle ,subtitle)
+                        (updated ,(date->string* (current-date)))
+                        (link (@ (href ,(string-append (site-domain site)
+                                                       "/" file-name))
+                                 (rel "self")))
+                        (link (@ (href ,(site-domain site))))
+                        ,@(map (cut post->atom-entry site <>
+                                    #:blog-prefix blog-prefix)
+                               (take-up-to max-entries (filter posts))))
+                 sxml->xml*))))
 
 (define* (atom-feeds-by-tag #:key
                             (prefix "feeds/tags")
