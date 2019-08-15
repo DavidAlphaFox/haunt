@@ -34,6 +34,7 @@
   #:use-module (haunt html)
   #:use-module (haunt serve mime-types)
   #:use-module (haunt builder atom)
+  #:use-module (web uri)
   #:export (rss-feed))
 
 ;; Reader beware: this isn't as nice as atom.scm, because rss isn't
@@ -51,32 +52,37 @@
 
 (define* (post->rss-item site post #:key (blog-prefix ""))
   "Convert POST into an RSS <item> node."
-  `(item
-    (title ,(post-ref post 'title))
-    ;; Looks like: <author>lawyer@boyer.net (Lawyer Boyer)</author>
-    (author
-     ,(let ((email (post-ref post 'email))
-            (author (post-ref post 'author)))
-        (string-append (if email
-                           (string-append email " ")
-                           "")
-                       (if author
-                           (string-append "(" author ")")
-                           ""))))
-    (pubDate ,(date->rfc822-str (post-date post)))
-    (link (@ (href ,(string-append blog-prefix "/"
-                                   (site-post-slug site post) ".html"))
-             (rel "alternate")))
-    (description ,(sxml->html-string (post-sxml post)))
-    ,@(map (lambda (enclosure)
-             `(enclosure (@ (title ,(enclosure-title enclosure))
-                            (url ,(enclosure-url enclosure))
-                            (type ,(enclosure-mime-type enclosure))
-                            ,@(map (match-lambda
-                                     ((key . value)
-                                      (list key value)))
-                                   (enclosure-extra enclosure)))))
-           (post-ref-all post 'enclosure))))
+  (let ((uri (uri->string
+              (build-uri (site-scheme site)
+                         #:host (site-domain site)
+                         #:path (string-append (if (string-prefix? "//" blog-prefix)
+                                                   "" "/")
+                                               blog-prefix "/"
+                                               (site-post-slug site post)
+                                               ".html")))))
+    `(item
+      (title ,(post-ref post 'title))
+      ;; Looks like: <author>lawyer@boyer.net (Lawyer Boyer)</author>
+      ,@(let ((email (post-ref post 'email))
+              (author (post-ref post 'author)))
+          (cond ((and email author)
+                 `((author ,(string-append email " (" author ")"))))
+                (email
+                 `((author ,email)))
+                (else '())))
+      (pubDate ,(date->rfc822-str (post-date post)))
+      (guid ,uri)
+      (link ,uri)
+      (description ,(sxml->html-string (post-sxml post)))
+      ,@(map (lambda (enclosure)
+               `(enclosure (@ (title ,(enclosure-title enclosure))
+                              (url ,(enclosure-url enclosure))
+                              (type ,(enclosure-mime-type enclosure))
+                              ,@(map (match-lambda
+                                       ((key . value)
+                                        (list key value)))
+                                     (enclosure-extra enclosure)))))
+             (post-ref-all post 'enclosure)))))
 
 (define* (rss-feed #:key
                    (file-name "rss-feed.xml")
@@ -93,14 +99,21 @@ FILTER: The procedure called to manipulate the posts list before rendering
 MAX-ENTRIES: The maximum number of posts to render in the feed"
   (lambda (site posts)
     (make-page file-name
-               `(rss (@ (version "2.0"))
+               `(rss (@ (version "2.0")
+                        (xmlns:atom "http://www.w3.org/2005/Atom"))
                      (channel
                       (title ,(site-title site))
                       ;; It looks like RSS's description and atom's subtitle
                       ;; are equivalent?
                       (description ,subtitle)
                       (pubDate ,(date->rfc822-str (current-date)))
-                      (link (@ (href ,(site-domain site))))
+                      (link ,(string-append (symbol->string (site-scheme site))
+                                            "://" (site-domain site) "/"))
+                      (atom:link (@ (href ,(string-append (symbol->string (site-scheme site))
+                                                          "://" (site-domain site)
+                                                          "/" file-name))
+                                    (rel "self")
+                                    (type "application/rss+xml")))
                       ,@(map (cut post->rss-item site <>
                                   #:blog-prefix blog-prefix)
                              (take-up-to max-entries (filter posts)))))
