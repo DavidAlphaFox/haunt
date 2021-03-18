@@ -55,9 +55,12 @@
   (let ((uri (uri->string
               (build-uri (site-scheme site)
                          #:host (site-domain site)
-                         #:path (string-append (if (string-prefix? "//" blog-prefix)
+                         #:path (string-append (if (string-prefix? "/" blog-prefix)
                                                    "" "/")
-                                               blog-prefix "/"
+                                               blog-prefix
+                                               (if (or (string-null? blog-prefix)
+                                                       (string-suffix? "/" blog-prefix))
+                                                   "" "/")
                                                (site-post-slug site post)
                                                ".html")))))
     `(item
