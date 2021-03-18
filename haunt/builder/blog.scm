@@ -30,7 +30,6 @@
   #:use-module (haunt artifact)
   #:use-module (haunt site)
   #:use-module (haunt post)
-  #:use-module (haunt page)
   #:use-module (haunt utils)
   #:use-module (haunt html)
   #:export (theme
