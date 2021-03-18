@@ -2,6 +2,7 @@
              (haunt builder blog)
              (haunt builder atom)
              (haunt builder assets)
+             (haunt builder rss)
              (haunt reader)
              (haunt reader skribe)
              (haunt reader texinfo)
@@ -17,4 +18,5 @@
       #:builders (list (blog)
                        (atom-feed)
                        (atom-feeds-by-tag)
+                       (rss-feed)
                        (static-directory "images")))
