@@ -27,9 +27,9 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (sxml simple)
+  #:use-module (haunt artifact)
   #:use-module (haunt site)
   #:use-module (haunt post)
-  #:use-module (haunt page)
   #:use-module (haunt utils)
   #:use-module (haunt html)
   #:use-module (haunt serve mime-types)
@@ -98,23 +98,28 @@ SUBTITLE: The feed subtitle
 FILTER: The procedure called to manipulate the posts list before rendering
 MAX-ENTRIES: The maximum number of posts to render in the feed"
   (lambda (site posts)
-    (make-page file-name
-               `(rss (@ (version "2.0")
-                        (xmlns:atom "http://www.w3.org/2005/Atom"))
-                     (channel
-                      (title ,(site-title site))
-                      ;; It looks like RSS's description and atom's subtitle
-                      ;; are equivalent?
-                      (description ,subtitle)
-                      (pubDate ,(date->rfc822-str (current-date)))
-                      (link ,(string-append (symbol->string (site-scheme site))
-                                            "://" (site-domain site) "/"))
-                      (atom:link (@ (href ,(string-append (symbol->string (site-scheme site))
+    (serialized-artifact file-name
+                         `(rss (@ (version "2.0")
+                                  (xmlns:atom "http://www.w3.org/2005/Atom"))
+                               (channel
+                                (title ,(site-title site))
+                                ;; It looks like RSS's description and atom's subtitle
+                                ;; are equivalent?
+                                (description ,subtitle)
+                                (pubDate ,(date->rfc822-str (current-date)))
+                                (link
+                                 ,(string-append (symbol->string
+                                                  (site-scheme site))
+                                                 "://" (site-domain site) "/"))
+                                (atom:link
+                                 (@ (href ,(string-append (symbol->string
+                                                           (site-scheme site))
                                                           "://" (site-domain site)
                                                           "/" file-name))
                                     (rel "self")
                                     (type "application/rss+xml")))
-                      ,@(map (cut post->rss-item site <>
-                                  #:blog-prefix blog-prefix)
-                             (take-up-to max-entries (filter posts)))))
-               sxml->xml*)))
+                                ,@(map (cut post->rss-item site <>
+                                            #:blog-prefix blog-prefix)
+                                       (take-up-to max-entries
+                                                   (filter posts)))))
+                         sxml->xml*)))
