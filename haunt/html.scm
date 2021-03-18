@@ -112,6 +112,8 @@ list ATTRS and the child nodes in BODY."
     (() *unspecified*)
     (('doctype type)
      (doctype->html type port))
+    (('!-- comment)
+     (display (string-append "<!--" comment "-->") port))
     (((? symbol? tag) ('@ attrs ...) body ...)
      (element->html tag attrs body port))
     (((? symbol? tag) body ...)
