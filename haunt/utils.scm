@@ -84,7 +84,7 @@ charcter."
 
 (define (join-file-name-components components)
   "Join COMPONENTS into a file name string."
-  (string-join components "/" 'prefix))
+  (string-join components "/"))
 
 (define (absolute-file-name file-name)
   "Return a an absolute file name string relative to the current
