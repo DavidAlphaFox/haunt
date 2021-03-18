@@ -83,7 +83,7 @@ post."
   (define (err file-name stat errno result)
     (error "file processing failed with errno: " file-name errno))
 
-  (file-system-fold enter? leaf noop noop noop err '() directory))
+  (file-system-fold enter? leaf noop noop noop err '() directory stat))
 
 ;;;
 ;;; Simple readers
