@@ -27,6 +27,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
+  #:use-module (haunt artifact)
   #:use-module (haunt site)
   #:use-module (haunt post)
   #:use-module (haunt page)
@@ -127,16 +128,16 @@ decorated by THEME, whose URLs start with PREFIX."
     (define (post->page post)
       (let ((base-name (string-append (site-post-slug site post)
                                       ".html")))
-        (make-page (make-file-name base-name)
-                   (render-post theme site post)
-                   sxml->html)))
+        (serialized-artifact (make-file-name base-name)
+                             (render-post theme site post)
+                             sxml->html)))
 
     (define collection->page
       (match-lambda
        ((title file-name filter)
-        (make-page (make-file-name file-name)
-                   (render-collection theme site title (filter posts) prefix)
-                   sxml->html))))
+        (serialized-artifact (make-file-name file-name)
+                             (render-collection theme site title (filter posts) prefix)
+                             sxml->html))))
 
     (append (map post->page posts)
             (map collection->page collections))))

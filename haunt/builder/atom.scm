@@ -29,6 +29,7 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
   #:use-module (sxml simple)
+  #:use-module (haunt artifact)
   #:use-module (haunt site)
   #:use-module (haunt post)
   #:use-module (haunt page)
@@ -184,20 +185,20 @@ MAX-ENTRIES: The maximum number of posts to render in the feed"
                 (build-uri (site-scheme site)
                            #:host (site-domain site)
                            #:path (string-append "/" file-name)))))
-      (make-page file-name
-                 `(feed (@ (xmlns "http://www.w3.org/2005/Atom"))
-                        (title ,(site-title site))
-                        (id ,uri)
-                        (subtitle ,subtitle)
-                        (updated ,(date->string* (current-date)))
-                        (link (@ (href ,(string-append (site-domain site)
-                                                       "/" file-name))
-                                 (rel "self")))
-                        (link (@ (href ,(site-domain site))))
-                        ,@(map (cut post->atom-entry site <>
-                                    #:blog-prefix blog-prefix)
-                               (take-up-to max-entries (filter posts))))
-                 sxml->xml*))))
+      (serialized-artifact file-name
+                           `(feed (@ (xmlns "http://www.w3.org/2005/Atom"))
+                                  (title ,(site-title site))
+                                  (id ,uri)
+                                  (subtitle ,subtitle)
+                                  (updated ,(date->string* (current-date)))
+                                  (link (@ (href ,(string-append (site-domain site)
+                                                                 "/" file-name))
+                                           (rel "self")))
+                                  (link (@ (href ,(site-domain site))))
+                                  ,@(map (cut post->atom-entry site <>
+                                              #:blog-prefix blog-prefix)
+                                         (take-up-to max-entries (filter posts))))
+                           sxml->xml*))))
 
 (define* (atom-feeds-by-tag #:key
                             (prefix "feeds/tags")

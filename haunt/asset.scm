@@ -27,6 +27,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
+  #:use-module (haunt artifact)
   #:use-module (haunt utils)
   #:export (make-asset
             asset?
@@ -71,7 +72,7 @@ files in DIRECTORY that match KEEP?, recursively."
             (let* ((file-name* (file-name-components file-name))
                    (target (join-file-name-components
                             (append dest* (drop file-name* base-length)))))
-              (cons (make-asset file-name target) memo))
+              (cons (verbatim-artifact file-name target) memo))
             memo))))
 
   (define (noop file-name stat memo) memo)
