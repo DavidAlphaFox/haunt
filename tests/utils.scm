@@ -56,7 +56,7 @@
   (file-name-components "/share/haunt"))
 
 (test-equal "join-file-name-components"
-  "/share/haunt/info/haunt.info"
+  "share/haunt/info/haunt.info"
   (join-file-name-components '("share" "haunt" "info" "haunt.info")))
 
 (test-equal "absolute-file-name, already absolute"
