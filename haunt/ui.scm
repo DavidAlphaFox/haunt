@@ -23,6 +23,7 @@
 ;;; Code:
 
 (define-module (haunt ui)
+  #:declarative? #f
   #:use-module (ice-9 format)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)

@@ -23,6 +23,7 @@
 ;;; Code:
 
 (define-module (haunt reader)
+  #:declarative? #f
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-11)

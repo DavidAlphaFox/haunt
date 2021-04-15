@@ -23,6 +23,7 @@
 ;;; Code:
 
 (define-module (haunt reader skribe)
+  #:declarative? #f
   #:use-module (haunt reader)
   #:use-module (haunt skribe)
   #:use-module (haunt skribe utils)
