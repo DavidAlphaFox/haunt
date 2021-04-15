@@ -1,6 +1,6 @@
 dnl -*- Autoconf -*-
 
-AC_INIT(Haunt, 0.2.4)
+AC_INIT(Haunt, 0.2.5)
 AC_CONFIG_SRCDIR(haunt)
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([color-tests -Wall -Wno-portability foreign])
