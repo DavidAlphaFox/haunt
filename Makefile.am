@@ -109,4 +109,4 @@ CLEANFILES =					\
 publish: distcheck
 	gpg --sign --armor --yes haunt-$(VERSION).tar.gz && \
         scp haunt-$(VERSION).tar.gz haunt-$(VERSION).tar.gz.asc \
-	    blog@dthompson.us:/var/www/files/haunt/
+	    publish@dthompson.us:/var/www/files/haunt/
