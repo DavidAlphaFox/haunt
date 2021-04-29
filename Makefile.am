@@ -107,6 +107,6 @@ CLEANFILES =					\
   $(TESTS:tests/%.scm=%.log)
 
 publish: distcheck
-	gpg --sign --armor --yes haunt-$(VERSION).tar.gz && \
+	gpg --sign --detach-sign --armor --yes haunt-$(VERSION).tar.gz && \
         scp haunt-$(VERSION).tar.gz haunt-$(VERSION).tar.gz.asc \
 	    publish@dthompson.us:/var/www/files/haunt/
