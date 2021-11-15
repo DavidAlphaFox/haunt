@@ -945,6 +945,8 @@ The maximum number of posts to render in each feed.  The default is
 @node Contributing
 @chapter Contributing
 
+Send patches and bug reports to @email{davet@@gnu.org}.
+
 @c *********************************************************************
 @node GNU Free Documentation License
 @appendix GNU Free Documentation License
