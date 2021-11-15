@@ -182,6 +182,26 @@ make
 make install
 @end example
 
+This will install Haunt to @file{/usr/local/}.  This is not part of
+the default load path for GNU Guile if you installed it from your
+distribution's package manager (@file{/usr} is.) You may choose to
+change the prefix to your GNU Guile's location with @code{./configure
+--prefix=/usr} or add file{/usr/local/} to GNU Guile's load path in
+your shell environment like this (replacing 3.0 with your GNU Guile
+version):
+
+@example
+export GUILE_LOAD_PATH="/usr/local/share/guile/site/3.0\
+$@{GUILE_LOAD_PATH:+:@}$GUILE_LOAD_PATH"
+
+export GUILE_LOAD_COMPILED_PATH="/usr/local/lib/guile/3.0/site-ccache\
+$@{GUILE_LOAD_COMPILED_PATH:+:@}$GUILE_COMPILED_LOAD_PATH"
+@end example
+
+(@pxref{Environment Variables, Environment Variables,, guile, GNU
+Guile Reference Manual} for more details on @env{GUILE_LOAD_PATH} and
+@env{GUILE_LOAD_COMPILED_PATH}.)
+
 @node Tutorial
 @chapter Tutorial
 
