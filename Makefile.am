@@ -90,6 +90,11 @@ AM_SCM_LOG_FLAGS = --no-auto-compile -L "$(top_srcdir)"
 
 info_TEXINFOS = doc/haunt.texi
 doc_haunt_TEXINFOS = doc/fdl-1.3.texi
+
+AM_MAKEINFOHTMLFLAGS = \
+  --css-ref=https://dthompson.us/css/dthompson.css \
+  --css-include=doc/manual.css
+
 dvi: # Don't build dvi docs
 
 EXTRA_DIST +=					\
