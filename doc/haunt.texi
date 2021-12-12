@@ -186,7 +186,7 @@ This will install Haunt to @file{/usr/local/}.  This is not part of
 the default load path for GNU Guile if you installed it from your
 distribution's package manager (@file{/usr} is.) You may choose to
 change the prefix to your GNU Guile's location with @code{./configure
---prefix=/usr} or add file{/usr/local/} to GNU Guile's load path in
+--prefix=/usr} or add @file{/usr/local/} to GNU Guile's load path in
 your shell environment like this (replacing 3.0 with your GNU Guile
 version):
 
