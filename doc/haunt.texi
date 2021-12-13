@@ -53,21 +53,9 @@ functional static site generator.
 * Command-line Interface::      Using Haunt from the command-line.
 * Programming Interface::       Using the Haunt API in Scheme.
 * Contributing::                How to contribute to Haunt.
-
 * GNU Free Documentation License::  The license of this manual.
 * Concept Index::               Concepts.
 * Programming Index::           Data types, procedures, syntax, and variables.
-
-@detailmenu
- --- The Detailed Node Listing ---
-
-Installation
-
-* Downloading::                 Downloading the source code.
-* Requirements::                Software needed to build and run Haunt.
-* Building::                    Building from source code.
-
-@end detailmenu
 @end menu
 
 @node Introduction
