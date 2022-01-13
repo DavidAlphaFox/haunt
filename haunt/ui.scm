@@ -22,8 +22,19 @@
 ;;
 ;;; Code:
 
-(define-module (haunt ui)
-  #:declarative? #f
+;; Hack to mark this module as non-declarative on Guile 3+ (which
+;; would otherwise print a warning) but not break when compiling on
+;; earlier versions of Guile.
+(define-syntax-rule (define-module* name args ...)
+  (cond-expand
+   (guile-3
+    (define-module name
+      #:declarative? #f
+      args ...))
+   (guile
+    (define-module name args ...))))
+
+(define-module* (haunt ui)
   #:use-module (ice-9 format)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
