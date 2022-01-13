@@ -46,6 +46,7 @@ bin_SCRIPTS =					\
 SOURCES =					\
   haunt/config.scm				\
   haunt/utils.scm				\
+  haunt/inotify.scm				\
   haunt/post.scm				\
   haunt/page.scm				\
   haunt/asset.scm				\
