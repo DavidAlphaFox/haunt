@@ -1,5 +1,5 @@
 ;;; Haunt --- Static site generator for GNU Guile
-;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2015, 2022 David Thompson <davet@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -29,11 +29,15 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 threads)
-  #:use-module (haunt site)
   #:use-module (haunt config)
-  #:use-module (haunt ui)
+  #:use-module (haunt inotify)
   #:use-module (haunt serve web-server)
+  #:use-module (haunt site)
+  #:use-module (haunt ui)
   #:export (haunt-serve))
+
+(define %linux?
+  (string=? (utsname:sysname (uname)) "Linux"))
 
 (define (show-help)
   (format #t "Usage: haunt serve [OPTION]
@@ -84,8 +88,46 @@ Start an HTTP server for the current site.~%")
         (apply display-error (stack-ref stack 0) cep args)
         (newline cep)))))
 
+;; TODO: Detect new directories and watch them, too.
+(define (watch/linux config-file check-dir? check-file?)
+  (let ((inotify (make-inotify)))
+    (define (no-op name stat result) result)
+    (define (watch-directory name stat result)
+      (and (check-dir? name)
+           (inotify-add-watch! inotify name
+                               '(create delete close-write moved-to moved-from))
+           #t))
+    (file-system-fold watch-directory no-op no-op no-op no-op no-op #t (getcwd))
+    (let loop ((processed-event? #f))
+      (cond
+       ((inotify-pending-events? inotify)
+        (let* ((event (inotify-read-event inotify))
+               (type (inotify-event-type event))
+               (file-name (string-append (inotify-watch-file-name
+                                          (inotify-event-watch event))
+                                         "/"
+                                         (inotify-event-file-name event))))
+          (if (and (check-dir? file-name) (check-file? file-name))
+              (let ((action (case type
+                              ((create) "create")
+                              ((delete) "delete")
+                              ((close-write) "write")
+                              ((moved-to moved-from) "move"))))
+                (format #t "watch: observed ~a '~a'~%" action file-name)
+                (loop #t))
+              (loop processed-event?))))
+       (processed-event?
+        (display "rebuilding...\n")
+        (call-with-error-handling
+         (lambda ()
+           (build-site (load-config config-file))))
+        (loop #f))
+       (else
+        (sleep 1)
+        (loop #f))))))
+
 ;; XXX: Make this less naive.
-(define (watch config-file check-dir? check-file?)
+(define (watch/fallback config-file check-dir? check-file?)
   "Watch the current working directory for changes to any of its files
 that match CHECK-FILE? and any subdirectories that match CHECK-DIR?.
 When a file has been changed, reload CONFIG-FILE and rebuild the
@@ -113,6 +155,7 @@ site."
 
   (let loop ((time (current-time)))
     (when (any-files-changed? time)
+      (display "watch: file changes detected")
       (display "rebuilding...\n")
       (call-with-error-handling
         (lambda ()
@@ -131,14 +174,20 @@ site."
     (format #t "serving ~a on port ~d~%" doc-root port)
 
     (when watch?
-      (call-with-new-thread
-       (lambda ()
-         (watch config
-                (let ((cwd       (getcwd))
-                      (build-dir (site-build-directory site)))
-                  (lambda (dir)
-                    (not
-                     (string-prefix? (string-append cwd "/" build-dir) dir))))
-                (site-file-filter site)))))
-
+      (let ((watch (if %linux?
+                       (begin
+                         (display "watch: using inotify mode\n")
+                         watch/linux)
+                       (begin
+                         (display "watch: using fallback mode\n")
+                         watch/fallback))))
+        (call-with-new-thread
+         (lambda ()
+           (watch config
+                  (let ((build-dir (string-append (getcwd) "/"
+                                                  (site-build-directory site))))
+                    (lambda (dir)
+                      (not
+                       (string-prefix? build-dir dir))))
+                  (site-file-filter site))))))
     (serve doc-root #:open-params `(#:port ,port))))
