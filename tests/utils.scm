@@ -1,5 +1,5 @@
 ;;; Haunt --- Static site generator for GNU Guile
-;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2015, 2022 David Thompson <davet@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -17,70 +17,65 @@
 ;;; along with Haunt.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (test-utils)
+  #:use-module (haunt utils)
   #:use-module (srfi srfi-19)
   #:use-module (srfi srfi-64)
-  #:use-module (haunt utils))
+  #:use-module (tests helper))
 
-(test-begin "utils")
+(with-tests "utils"
+  (test-equal "flatten, all"
+    '(1 2 3 4 5 6)
+    (flatten '(1 (2 3 (4) (5 (6))))))
 
-(test-equal "flatten, all"
-  '(1 2 3 4 5 6)
-  (flatten '(1 (2 3 (4) (5 (6))))))
+  (test-equal "flatten, limited depth"
+    '(1 2 3 4 5 (6))
+    (flatten '(1 (2 3 (4) (5 (6)))) 2))
 
-(test-equal "flatten, limited depth"
-  '(1 2 3 4 5 (6))
-  (flatten '(1 (2 3 (4) (5 (6)))) 2))
+  (test-equal "flat-map"
+    '(5 7 9)
+    (flat-map (compose list +) '(1 2 3) '(4 5 6)))
 
-(test-equal "flat-map"
-  '(5 7 9)
-  (flat-map (compose list +) '(1 2 3) '(4 5 6)))
+  (test-equal "string-split-at, no match"
+    '("foo")
+    (string-split-at "foo" #\z))
 
-(test-equal "string-split-at, no match"
-  '("foo")
-  (string-split-at "foo" #\z))
+  (test-equal "string-split-at, match"
+    '("foo" "bar")
+    (string-split-at "foo/bar" #\/))
 
-(test-equal "string-split-at, match"
-  '("foo" "bar")
-  (string-split-at "foo/bar" #\/))
+  (test-equal "file-name-components, empty string"
+    '()
+    (file-name-components ""))
 
-(test-equal "file-name-components, empty string"
-  '()
-  (file-name-components ""))
+  (test-equal "file-name-components, root directory"
+    '("")
+    (file-name-components "/"))
 
-(test-equal "file-name-components, root directory"
-  '("")
-  (file-name-components "/"))
+  (test-equal "file-name-components, full file name"
+    '("share" "haunt")
+    (file-name-components "/share/haunt"))
 
-(test-equal "file-name-components, full file name"
-  '("share" "haunt")
-  (file-name-components "/share/haunt"))
+  (test-equal "join-file-name-components"
+    "share/haunt/info/haunt.info"
+    (join-file-name-components '("share" "haunt" "info" "haunt.info")))
 
-(test-equal "join-file-name-components"
-  "share/haunt/info/haunt.info"
-  (join-file-name-components '("share" "haunt" "info" "haunt.info")))
+  (test-equal "absolute-file-name, already absolute"
+    "/share/haunt"
+    (absolute-file-name "/share/haunt"))
 
-(test-equal "absolute-file-name, already absolute"
-  "/share/haunt"
-  (absolute-file-name "/share/haunt"))
+  (test-equal "absolute-file-name, relative file name"
+    (string-append (getcwd) "/share/haunt")
+    (absolute-file-name "share/haunt"))
 
-(test-equal "absolute-file-name, relative file name"
-  (string-append (getcwd) "/share/haunt")
-  (absolute-file-name "share/haunt"))
+  (test-equal "take-up-to, less than n elements"
+    '(1 2 3)
+    (take-up-to 4 '(1 2 3)))
 
-(test-equal "take-up-to, less than n elements"
-  '(1 2 3)
-  (take-up-to 4 '(1 2 3)))
+  (test-equal "take-up-to, more than n elements"
+    '(1 2)
+    (take-up-to 2 '(1 2 3)))
 
-(test-equal "take-up-to, more than n elements"
-  '(1 2)
-  (take-up-to 2 '(1 2 3)))
-
-(test-equal "string->date*"
-  (make-date 0 0 15 06 05 09 2015
-             (date-zone-offset (string->date "2015-09-05" "~Y~m~d")))
-  (string->date* "2015-09-05 06:15"))
-
-(test-end)
-
-
-(exit (zero? (test-runner-fail-count (test-runner-current))))
+  (test-equal "string->date*"
+    (make-date 0 0 15 06 05 09 2015
+               (date-zone-offset (string->date "2015-09-05" "~Y~m~d")))
+    (string->date* "2015-09-05 06:15")))

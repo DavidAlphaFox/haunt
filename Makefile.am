@@ -82,6 +82,7 @@ SOURCES +=					\
 endif
 
 TESTS =						\
+  tests/helper.scm				\
   tests/post.scm				\
   tests/utils.scm
 
