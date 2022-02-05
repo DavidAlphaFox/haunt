@@ -25,6 +25,7 @@
 
 (define-module (haunt builder blog)
   #:use-module (ice-9 match)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-19)
   #:use-module (haunt artifact)
@@ -38,6 +39,7 @@
             theme-layout
             theme-post-template
             theme-collection-template
+            theme-pagination-template
             with-layout
             render-post
             render-collection
@@ -47,12 +49,13 @@
             blog))
 
 (define-record-type <theme>
-  (make-theme name layout post-template collection-template)
+  (make-theme name layout post-template collection-template pagination-template)
   theme?
   (name theme-name)
   (layout theme-layout)
   (post-template theme-post-template)
-  (collection-template theme-collection-template))
+  (collection-template theme-collection-template)
+  (pagination-template theme-pagination-template))
 
 (define (ugly-default-layout site title body)
   `((doctype "html")
@@ -84,24 +87,37 @@
                    ,(date->string* (post-date post)))))
             posts))))
 
+(define (ugly-default-pagination-template site body previous-page next-page)
+  `(,@body
+    (div
+     ,(if previous-page
+          `(a (@ (href ,previous-page)) "← Previous")
+          '())
+     " — "
+     ,(if next-page
+          `(a (@ (href ,next-page)) "Next →")
+          '()))))
+
 (define* (theme #:key
                 (name "Untitled")
                 (layout ugly-default-layout)
                 (post-template ugly-default-post-template)
-                (collection-template ugly-default-collection-template))
-  (make-theme name layout post-template collection-template))
+                (collection-template ugly-default-collection-template)
+                (pagination-template ugly-default-pagination-template))
+  (make-theme name layout post-template collection-template
+              pagination-template))
 
 (define (with-layout theme site title body)
   ((theme-layout theme) site title body))
 
 (define (render-post theme site post)
-  (let ((title (post-ref post 'title))
-        (body ((theme-post-template theme) post)))
-    (with-layout theme site title body)))
+  ((theme-post-template theme) post))
 
 (define (render-collection theme site title posts prefix)
-  (let ((body ((theme-collection-template theme) site title posts prefix)))
-    (with-layout theme site title body)))
+  ((theme-collection-template theme) site title posts prefix))
+
+(define (render-pagination theme site body previous-page next-page)
+  ((theme-pagination-template theme) site body previous-page next-page))
 
 (define (date->string* date)
   "Convert DATE to human readable string."
@@ -111,13 +127,17 @@
   (theme #:name "Ugly"
          #:layout ugly-default-layout
          #:post-template ugly-default-post-template
-         #:collection-template ugly-default-collection-template))
+         #:collection-template ugly-default-collection-template
+         #:pagination-template ugly-default-pagination-template))
 
 (define* (blog #:key (theme ugly-theme) prefix
                (collections
-                `(("Recent Posts" "index.html" ,posts/reverse-chronological))))
+                `(("Recent Posts" "index.html" ,posts/reverse-chronological)))
+               posts-per-page)
   "Return a procedure that transforms a list of posts into pages
-decorated by THEME, whose URLs start with PREFIX."
+decorated by THEME, whose URLs start with PREFIX.  If POSTS-PER-PAGE
+is specified, collections will be broken up into several pages with up
+to POSTS-PER-PAGE posts on each page."
   (define (make-file-name base-name)
     (if prefix
         (string-append prefix "/" base-name)
@@ -126,17 +146,82 @@ decorated by THEME, whose URLs start with PREFIX."
   (lambda (site posts)
     (define (post->page post)
       (let ((base-name (string-append (site-post-slug site post)
-                                      ".html")))
+                                      ".html"))
+            (title (post-ref post 'title))
+            (body ((theme-post-template theme) post)))
         (serialized-artifact (make-file-name base-name)
-                             (render-post theme site post)
+                             (with-layout theme site title body)
                              sxml->html)))
+
+    (define (paginate base-name items)
+      (define (make-page-file-name i)
+        (make-file-name
+         ;; First page does not get a page number added to the file
+         ;; name.
+         (if (= 0 i)
+             (string-append base-name ".html")
+             (string-append base-name "-"
+                            (number->string i)
+                            ".html"))))
+      (define (make-page i items)
+        (list (make-page-file-name i) (reverse items)))
+      (let loop ((items items)
+                 (n 0)
+                 (i 0)
+                 (page '()))
+        (if (= n posts-per-page)
+            (cons (make-page i page) (loop items 0 (+ i 1) '()))
+            (match items
+              (()
+               (list (make-page i page)))
+              ((item . rest)
+               (loop rest (+ n 1) i (cons item page)))))))
 
     (define collection->page
       (match-lambda
-       ((title file-name filter)
-        (serialized-artifact (make-file-name file-name)
-                             (render-collection theme site title (filter posts) prefix)
-                             sxml->html))))
+        ((title file-name filter)
+         ;; Earlier versions of Haunt, which did not have collection
+         ;; pagination, told users to include a full file name, not
+         ;; just a base name, so we continue to honor that style of
+         ;; configuration.
+         (let ((base-name (if (string-suffix? ".html" file-name)
+                              (string-take file-name
+                                           (- (string-length file-name) 5))
+                              file-name))
+               (filtered-posts (filter posts)))
+           (define (make-collection-page current-page prev-page next-page)
+             (match current-page
+               ((file-name posts)
+                (let* ((coll-sxml (render-collection theme site title
+                                                     posts prefix))
+                       (page-sxml (with-layout theme site title
+                                               (render-pagination theme
+                                                                  site
+                                                                  coll-sxml
+                                                                  (match prev-page
+                                                                    (#f #f)
+                                                                    ((file-name _) file-name))
+                                                                  (match next-page
+                                                                    (#f #f)
+                                                                    ((file-name _) file-name))))))
+                  (serialized-artifact file-name page-sxml sxml->html)))))
+           (if posts-per-page
+               (let loop ((pages (paginate base-name filtered-posts))
+                          (prev-page #f))
+                 (match pages
+                   (()
+                    '())
+                   ((last-page)
+                    (list (make-collection-page last-page prev-page #f)))
+                   ((and (page . rest) (_ next-page . _))
+                    (cons (make-collection-page page prev-page next-page)
+                          (loop rest page)))))
+               (list
+                (serialized-artifact (string-append base-name ".html")
+                                     (with-layout theme site title
+                                                  (render-collection theme site title
+                                                                     filtered-posts prefix))
+                                     sxml->html)))))))
 
     (append (map post->page posts)
-            (map collection->page collections))))
+            (append-map collection->page collections))))
