@@ -30,7 +30,6 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 threads)
   #:use-module (haunt config)
-  #:use-module (haunt inotify)
   #:use-module (haunt serve web-server)
   #:use-module (haunt site)
   #:use-module (haunt ui)
@@ -90,6 +89,17 @@ Start an HTTP server for the current site.~%")
 
 ;; TODO: Detect new directories and watch them, too.
 (define (watch/linux config-file check-dir? check-file?)
+  ;; Lazy load inotify procedures.  Requiring the module in the
+  ;; define-module definition would cause crashes on non-Linux
+  ;; platforms where the FFI cannot bind to inotify functions.
+  (define make-inotify (@ (haunt inotify) make-inotify))
+  (define inotify-add-watch! (@ (haunt inotify) inotify-add-watch!))
+  (define inotify-pending-events? (@ (haunt inotify) inotify-pending-events?))
+  (define inotify-read-event (@ (haunt inotify) inotify-read-event))
+  (define inotify-watch-file-name (@ (haunt inotify) inotify-watch-file-name))
+  (define inotify-event-watch (@ (haunt inotify) inotify-event-watch))
+  (define inotify-event-file-name (@ (haunt inotify) inotify-event-file-name))
+  (define inotify-event-type (@ (haunt inotify) inotify-event-type))
   (let ((inotify (make-inotify)))
     (define (no-op name stat result) result)
     (define (watch-directory name stat result)

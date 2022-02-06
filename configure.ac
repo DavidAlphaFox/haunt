@@ -21,4 +21,7 @@ AM_CONDITIONAL([HAVE_GUILE_READER], [test "x$have_guile_reader" = "xyes"])
 GUILE_MODULE_AVAILABLE([have_guile_commonmark], [(commonmark)])
 AM_CONDITIONAL([HAVE_GUILE_COMMONMARK], [test "x$have_guile_commonmark" = "xyes"])
 
+AC_CHECK_FUNCS(inotify_init)
+AM_CONDITIONAL([HAVE_INOTIFY], [test "x$HAVE_INOTIFY_INIT" = "xyes"])
+
 AC_OUTPUT
