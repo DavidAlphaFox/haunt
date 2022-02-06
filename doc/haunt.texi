@@ -839,7 +839,8 @@ output directory.  By default, @var{dest} is @var{directory}.
 (use-modules (haunt builder blog))
 @end example
 
-@deffn {Scheme Procedure} theme [#:name #:layout #:post-template #:collection-template]
+@deffn {Scheme Procedure} theme [#:name #:layout #:post-template #:collection-template @
+       #:pagination-template]
 Create a new theme named @var{name}.
 
 The procedure @var{layout} accepts three arguments: a site, a page
@@ -849,21 +850,25 @@ tree for a web page.
 
 The procedure @var{post-template} accepts a single argument: a post.
 Its purpose is to return an SXML tree containing the contents of the
-post, applying any desired post-processing operations.  The values
-returned from this procedure will be wrapped in the theme's layout.
+post, applying any desired post-processing operations.
 
 The procedure @var{collection-template} accepts four arguments: a
 site, a title string, a list of posts, and a URL prefix string.  Its
 purpose is to return an SXML tree containing the body of the
-collection page.  The values returned from this procedure will be
-wrapped in the theme's layout.
+collection page.
+
+The procedure @var{pagination-template} accepts four arguments: a
+site, an SXML tree, the file name of the previous page, and the file
+name of the next page.  Its purpose is to incorporate the given SXML
+tree into a larger document that incorporates previous/next page
+links.
 @end deffn
 
 @deffn {Scheme Procedure} theme? @var{object}
 Return @code{#t} if @var{object} is a theme object.
 @end deffn
 
-@deffn {Scheme Procedure} blog [#:theme #:prefix #:collections]
+@deffn {Scheme Procedure} blog [#:theme #:prefix #:collections #:posts-per-page]
 Create a builder procedure that transforms a list of posts into pages
 decorated by @var{theme}, a theme object, whose URLs start with
 @var{prefix}.
@@ -892,6 +897,10 @@ select all posts that are written by a particular author.
 
 By default, a single collection is created that lists posts in reverse
 chronological order and writes to @file{index.html}.
+
+Also by default, collection pages are not paginated.  When there are a
+lot of posts in one or more collections, it is best to paginate them.
+To do so, pass the @var{posts-per-page} argument.
 
 The default theme is intended only for testing purposes.
 
