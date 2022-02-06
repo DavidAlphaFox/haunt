@@ -89,17 +89,21 @@ Start an HTTP server for the current site.~%")
 
 ;; TODO: Detect new directories and watch them, too.
 (define (watch/linux config-file check-dir? check-file?)
-  ;; Lazy load inotify procedures.  Requiring the module in the
+  ;; Lazy load inotify module.  Requiring the module in the
   ;; define-module definition would cause crashes on non-Linux
   ;; platforms where the FFI cannot bind to inotify functions.
-  (define make-inotify (@ (haunt inotify) make-inotify))
-  (define inotify-add-watch! (@ (haunt inotify) inotify-add-watch!))
-  (define inotify-pending-events? (@ (haunt inotify) inotify-pending-events?))
-  (define inotify-read-event (@ (haunt inotify) inotify-read-event))
-  (define inotify-watch-file-name (@ (haunt inotify) inotify-watch-file-name))
-  (define inotify-event-watch (@ (haunt inotify) inotify-event-watch))
-  (define inotify-event-file-name (@ (haunt inotify) inotify-event-file-name))
-  (define inotify-event-type (@ (haunt inotify) inotify-event-type))
+  (define inotify-module (resolve-module '(haunt inotify)))
+  (define make-inotify (module-ref inotify-module 'make-inotify))
+  (define inotify-add-watch! (module-ref inotify-module 'inotify-add-watch!))
+  (define inotify-pending-events?
+    (module-ref inotify-module 'inotify-pending-events?))
+  (define inotify-read-event (module-ref inotify-module 'inotify-read-event))
+  (define inotify-watch-file-name
+    (module-ref inotify-module 'inotify-watch-file-name))
+  (define inotify-event-watch (module-ref inotify-module 'inotify-event-watch))
+  (define inotify-event-file-name
+    (module-ref inotify-module 'inotify-event-file-name))
+  (define inotify-event-type (module-ref inotify-module 'inotify-event-type))
   (let ((inotify (make-inotify)))
     (define (no-op name stat result) result)
     (define (watch-directory name stat result)
