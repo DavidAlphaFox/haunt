@@ -145,7 +145,7 @@ There is NO WARRANTY, to the extent permitted by law.~%"
      (show-haunt-usage))
     ((or ("-h") ("--help"))
      (show-haunt-help))
-    (("--version")
+    ((or ("-V") ("--version"))
      (show-version-and-exit "haunt"))
     (((? option? opt) _ ...)
      (format (current-error-port)

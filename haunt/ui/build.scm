@@ -38,7 +38,7 @@ Compile the site defined in the current directory.~%")
   (display "
   -h, --help             display this help and exit")
   (display "
-  --version              display version information and exit")
+  -V, --version          display version information and exit")
   (newline))
 
 (define %options
