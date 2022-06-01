@@ -24,6 +24,7 @@
 
 (define-module (haunt ui serve)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
@@ -43,6 +44,8 @@
 Start an HTTP server for the current site.~%")
   (display "
   -p, --port             port to listen on")
+  (display "
+  -h, --host             host address (IP address, \"localhost\", or \"any\")")
   (display "
   -w, --watch            rebuild site when files change")
   (newline)
@@ -65,14 +68,32 @@ Start an HTTP server for the current site.~%")
          (option '(#\p "port") #t #f
                  (lambda (opt name arg result)
                    (alist-cons 'port (string->number* arg) result)))
+         (option '(#\b "host") #t #f
+                 (lambda (opt name arg result)
+                   (define host-addr
+                     (match arg
+                       ((or "loopback" "localhost") INADDR_LOOPBACK)
+                       ("any"      INADDR_ANY)
+                       ;; lazy way of doing this...
+                       ;; "." or ":" indicates ipv4 or ipv6
+                       ((? (cut string-contains <> "."))
+                        (inet-pton AF_INET arg))
+                       ((? (cut string-contains <> ":"))
+                        (inet-pton AF_INET6 arg))
+                       (_
+                        (format #t "Unrecognized option for --host: ~a\n" arg)
+                        (display "Must be an IP address, \"localhost\", or \"any\".\n")
+                        (exit 1))))
+                   (alist-cons 'host host-addr result)))
          (option '(#\w "watch") #f #f
                  (lambda (opt name arg result)
                    (alist-cons 'watch? #t result)))
          %common-options))
 
 (define %default-options
-  (cons '(port . 8080)
-        %default-common-options))
+  (append `((port . 8080)
+            (host . ,INADDR_LOOPBACK))
+          %default-common-options))
 
 (define (call-with-error-handling thunk)
   (catch #t
@@ -198,6 +219,7 @@ site."
 (define (haunt-serve . args)
   (let* ((opts     (simple-args-fold args %options %default-options))
          (port     (assq-ref opts 'port))
+         (host     (assq-ref opts 'host))
          (watch?   (assq-ref opts 'watch?))
          (config   (assq-ref opts 'config))
          (site     (load-config config))
@@ -221,4 +243,5 @@ site."
                       (not
                        (string-prefix? build-dir dir))))
                   (site-file-filter site))))))
-    (serve doc-root #:open-params `(#:port ,port))))
+    (serve doc-root #:open-params `(#:port ,port
+                                    #:addr ,host))))

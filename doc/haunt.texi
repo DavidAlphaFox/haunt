@@ -348,7 +348,16 @@ Load the Haunt site declaration from @var{configuration-file}.
 @item --port=@var{port}
 @itemx -p @var{port}
 
-Listen for HTTP requests on @var{port}.
+Listen for HTTP requests on @var{port}.  Defaults to 8080.
+
+@item --host=@var{host}
+@itemx -p @var{host}
+
+Listen for HTTP requests on @var{host}.  Accepts an IP address (IPv4
+or IPv6), @code{localhost} or @code{loopback} to serve on the local
+loopback device (the default), or @code{any} to bind on all local
+available ports (useful if you want to show off your website to
+someone else on your LAN, or something.)
 
 @item --watch
 @itemx -w
