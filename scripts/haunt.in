@@ -19,6 +19,15 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with Haunt.  If not, see <http://www.gnu.org/licenses/>.
 
+(define-syntax-rule (push! elt v) (set! v (cons elt v)))
+
+;; Automatically add Haunt modules to Guile's load path so that users
+;; aren't wondering why Haunt isn't working when the modules aren't
+;; installed to Guile's default module locations.
+(unless (getenv "HAUNT_UNINSTALLED")
+  (push! "@guilemoduledir@" %load-path)
+  (push! "@guileobjectdir@" %load-compiled-path))
+
 (use-modules (haunt ui))
 
 (apply haunt-main (command-line))

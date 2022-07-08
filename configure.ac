@@ -14,6 +14,16 @@ AC_CONFIG_FILES([scripts/haunt], [chmod +x scripts/haunt])
 GUILE_PKG([3.0 2.2 2.0])
 GUILE_PROGS
 
+dnl Compute complete installation directories for .scm and .go files
+dnl so that the Haunt executable can automagically add them to Guile's
+dnl load path.
+haunt_prefix="`eval echo $prefix | sed -e"s|NONE|/usr/local|g"`"
+haunt_libdir="`eval echo $libdir | sed -e"s|NONE|$haunt_prefix|g"`"
+guilemoduledir="`eval echo ${datarootdir}/guile/site/$GUILE_EFFECTIVE_VERSION | sed -e"s|NONE|$haunt_prefix|g"`"
+guileobjectdir="`eval echo ${libdir}/guile/$GUILE_EFFECTIVE_VERSION/site-ccache | sed -e"s|NONE|$haunt_prefix|g"`"
+AC_SUBST([guilemoduledir])
+AC_SUBST([guileobjectdir])
+
 dnl Guile-reader is needed for Skribe support
 GUILE_MODULE_AVAILABLE([have_guile_reader], [(system reader)])
 AM_CONDITIONAL([HAVE_GUILE_READER], [test "x$have_guile_reader" = "xyes"])
