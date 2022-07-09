@@ -58,6 +58,7 @@ SOURCES =					\
   haunt/builder/rss.scm				\
   haunt/reader.scm				\
   haunt/reader/texinfo.scm			\
+  haunt/watch/fallback.scm			\
   haunt/ui.scm					\
   haunt/ui/build.scm				\
   haunt/ui/serve.scm				\
@@ -82,7 +83,9 @@ endif
 
 if HAVE_INOTIFY
 
-SOURCES += haunt/inotify.scm
+SOURCES += 					\
+  haunt/inotify.scm				\
+  haunt/watch/linux.scm
 
 endif
 
