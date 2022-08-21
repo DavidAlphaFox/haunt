@@ -33,4 +33,7 @@ AM_CONDITIONAL([HAVE_GUILE_COMMONMARK], [test "x$have_guile_commonmark" = "xyes"
 
 AC_CHECK_FUNC([inotify_init], [AM_CONDITIONAL(HAVE_INOTIFY, true)], [AM_CONDITIONAL(HAVE_INOTIFY, false)])
 
+AC_PATH_PROG([RSYNC], [rsync])
+AM_CONDITIONAL([HAVE_RSYNC], [test "x$RSYNC" != "x"])
+
 AC_OUTPUT

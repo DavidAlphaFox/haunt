@@ -50,17 +50,19 @@ SOURCES =					\
   haunt/page.scm				\
   haunt/asset.scm				\
   haunt/artifact.scm				\
+  haunt/reader.scm				\
+  haunt/publisher.scm				\
   haunt/site.scm				\
   haunt/html.scm				\
   haunt/builder/assets.scm			\
   haunt/builder/atom.scm			\
   haunt/builder/blog.scm			\
   haunt/builder/rss.scm				\
-  haunt/reader.scm				\
   haunt/reader/texinfo.scm			\
   haunt/watch/fallback.scm			\
   haunt/ui.scm					\
   haunt/ui/build.scm				\
+  haunt/ui/publish.scm				\
   haunt/ui/serve.scm				\
   haunt/serve/mime-types.scm			\
   haunt/serve/web-server.scm
@@ -86,6 +88,12 @@ if HAVE_INOTIFY
 SOURCES += 					\
   haunt/inotify.scm				\
   haunt/watch/linux.scm
+
+endif
+
+if HAVE_RSYNC
+
+SOURCES += haunt/publisher/rsync.scm
 
 endif
 

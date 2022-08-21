@@ -1,5 +1,5 @@
 ;;; Haunt --- Static site generator for GNU Guile
-;;; Copyright © 2015 David Thompson <davet@gnu.org>
+;;; Copyright © 2022 David Thompson <davet@gnu.org>
 ;;;
 ;;; This file is part of Haunt.
 ;;;
@@ -18,14 +18,30 @@
 
 ;;; Commentary:
 ;;
-;; Haunt configuration.
+;; Site publishing abstraction.
 ;;
 ;;; Code:
 
-(define-module (haunt config)
-  #:export (%haunt-version
-            %rsync))
+(define-module (haunt publisher)
+  #:use-module (srfi srfi-9)
+  #:export (%default-publisher-name
+            make-publisher
+            publisher?
+            publisher-name
+            publisher-proc
+            publish
+            run-command))
 
-(define %haunt-version "@PACKAGE_VERSION@")
+(define %default-publisher-name 'production)
 
-(define %rsync "@RSYNC@")
+(define-record-type <publisher>
+  (make-publisher name proc)
+  publisher?
+  (name publisher-name)
+  (proc publisher-proc))
+
+(define (publish publisher site)
+  ((publisher-proc publisher) site))
+
+(define (run-command program . args)
+  (zero? (apply system* program args)))
