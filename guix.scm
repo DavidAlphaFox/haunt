@@ -56,16 +56,9 @@
      (modify-phases %standard-phases
        (add-after 'unpack 'bootstrap
          (lambda _ (zero? (system* "sh" "bootstrap")))))))
-  (native-inputs
-   `(("autoconf" ,autoconf)
-     ("automake" ,automake)
-     ("pkg-config" ,pkg-config)
-     ("texinfo" ,texinfo)))
-  (inputs
-   `(("guile" ,guile-3.0)))
-  (propagated-inputs
-   `(("guile-commonmark" ,guile-commonmark)
-     ("guile-reader" ,guile-reader)))
+  (native-inputs (list autoconf automake pkg-config texinfo))
+  (inputs (list guile-3.0))
+  (propagated-inputs (list guile-commonmark guile-reader))
   (synopsis "Functional static site generator")
   (description "Haunt is a static site generator written in Guile
 Scheme.  Haunt features a functional build system and an extensible
