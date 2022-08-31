@@ -30,6 +30,7 @@
 
 (use-modules (guix packages)
              (guix licenses)
+             (guix gexp)
              (guix git-download)
              (guix build-system gnu)
              (gnu packages)
@@ -39,17 +40,14 @@
              (gnu packages pkg-config)
              (gnu packages texinfo))
 
+(define %source-dir (dirname (current-filename)))
+
 (package
   (name "haunt")
-  (version "0.2")
-  (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "git://dthompson.us/haunt.git")
-                  (commit "f0a7c2b14a201448432d3564d851ee0686d5b1b1")))
-            (sha256
-             (base32
-              "1dnzsw18blhr8admw48zbl3ilz3iiqmb149i37y820h0imqfli0v"))))
+  (version "0.2.6")
+  (source (local-file %source-dir
+                      #:recursive? #t
+                      #:select? (git-predicate %source-dir)))
   (build-system gnu-build-system)
   (arguments
    '(#:phases
