@@ -30,8 +30,7 @@
 
 (use-modules (guix packages)
              (guix licenses)
-             (guix gexp)
-             (guix git-download)
+             (guix git)
              (guix build-system gnu)
              (gnu packages)
              (gnu packages autotools)
@@ -40,14 +39,10 @@
              (gnu packages pkg-config)
              (gnu packages texinfo))
 
-(define %source-dir (dirname (current-filename)))
-
 (package
   (name "haunt")
   (version "0.2.6")
-  (source (local-file %source-dir
-                      #:recursive? #t
-                      #:select? (git-predicate %source-dir)))
+  (source (git-checkout (url (dirname (current-filename)))))
   (build-system gnu-build-system)
   (arguments
    '(#:phases
