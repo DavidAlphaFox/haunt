@@ -24,7 +24,7 @@
 ;;
 ;; To use as the basis for a development environment, run:
 ;;
-;;   guix environment -l guix.scm
+;;   guix shell
 ;;
 ;;; Code:
 
