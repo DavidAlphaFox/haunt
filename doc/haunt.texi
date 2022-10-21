@@ -478,9 +478,8 @@ Return the list of builder procedures for @var{site}.
 @end example
 
 Posts represent the articles that are kept in a site's post directory
-and written in a markup format that Haunt can
-understand. @pxref{Readers}) for how files on disk can be transformed
-into posts.
+and written in a markup format that Haunt can understand.
+@xref{Readers} for how files on disk can be transformed into posts.
 
 @deffn {Scheme Procedure} make-post @var{file-name} @var{metadata} @var{sxml}
 Create a new post object that represents the contents of the file
