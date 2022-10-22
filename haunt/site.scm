@@ -124,11 +124,15 @@ PUBLISHERS: A list of publisher objects for upload site contents to a remote loc
       (mkdir build-dir))
     (for-each (match-lambda
                 ((? page? page)
-                 (display "warning: page objects are deprecated; switch to serialized-artifact\n")
+                 (issue-deprecation-warning
+                  "Page objects are deprecated"
+                  "  Use serialized-artifact instead")
                  (format #t "writing page '~a'~%" (page-file-name page))
                  (write-page page build-dir))
                 ((? asset? asset)
-                 (display "warning: asset objects are deprecated; switch to verbatim-artifact\n")
+                 (issue-deprecation-warning
+                  "Asset objects are deprecated"
+                  "  Use verbatim-artifact instead")
                  (format #t "copying asset '~a' → '~a'~%"
                          (asset-source asset)
                          (asset-target asset))
