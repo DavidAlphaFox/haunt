@@ -1,0 +1,46 @@
+* TODO
+** Allow collection pages to live in a different directory than posts.
+** Feature request: Auto-reload pages when --watch detects changes
+** External command processing
+Hacky experimentation:
+#+BEGIN_SRC scheme
+  (use-modules (ice-9 match))
+
+  (call-with-output-file "bloop.txt"
+    (lambda (port)
+      (match (primitive-fork)
+        (0
+         (close 1)
+         (dup2 (fileno port) 1)
+         (execlp "grep" "-e" "cat" "animals"))
+        (pid
+         (waitpid pid)))))
+
+  (define (gcc c-file o-file)
+    (list "gcc" "-o" o-file c-file))
+
+  (define (external-artifact source destination command)
+    (unless (file-exists? source)
+      (error "input file does not exist" source))
+    (make-artifact destination
+                   (lambda (output)
+                     (let ((command* (append command (list source))))
+                       (format #t "run '~a' → '~a'~%"
+                               (string-join command* " ")
+                               destination)
+                       (call-with-output-file output
+                         (lambda (port)
+                           ;; Run the command in a new process with
+                           ;; stdout redirected into the output file.
+                           (match (primitive-fork)
+                             (0
+                              (close 1)
+                              (dup2 (fileno port) 1)
+                              (apply execlp command*))
+                             (pid
+                              (match (waitpid pid)
+                                ((_ . status)
+                                 (unless (zero? (status:exit-val status))
+                                   (error "command failed" command*))))))))))))
+
+#+END_SRC
