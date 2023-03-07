@@ -86,7 +86,7 @@ specified."
   (or (post-ref post 'date) %default-date))
 
 (define (post-time post)
-  (date->time-utc (post-ref post 'date)))
+  (date->time-utc (post-date post)))
 
 (define (posts/reverse-chronological posts)
   "Returns POSTS sorted in reverse chronological order."
