@@ -1,4 +1,16 @@
-* TODO
+* To-do list
+** Allow for cache-busting assets
+Providing the option to incorporate a hash of CSS, JS, etc. assets
+into the URLs for those assets would be nice to ensure browser cache
+misses when updates occur.  Using the query string for this would keep
+the URL paths the same but the overall URL different.
+** Allow #:prefix arg for 'blog' to be a procedure
+In addition to a string. Will allow for custom placement of blog
+posts. Some people want a hierarchy based on date, for example.
+** Add blog theme example to manual
+** Remove website directory
+That is no longer used for the actual website
+** Add docs for artifacts
 ** Allow collection pages to live in a different directory than posts.
 ** Feature request: Auto-reload pages when --watch detects changes
 ** External command processing
@@ -44,3 +56,5 @@ Hacky experimentation:
                                    (error "command failed" command*))))))))))))
 
 #+END_SRC
+** Org-mode support
+Just shell out to emacs using batch mode!
