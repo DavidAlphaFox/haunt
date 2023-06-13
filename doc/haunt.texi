@@ -831,11 +831,10 @@ create a simple blog with an Atom feed.
 (use-modules (haunt builder assets))
 @end example
 
-@deffn {Scheme Procedure} static-directory @var{directory} @
-       [@var{dest} @var{directory}]
+@deffn {Scheme Procedure} static-directory @var{directory} [@var{dest}]
 
 Create a builder procedure that recursively copies all of the files in
-@var{directory}, a file names relative to a site's source directory,
+@var{directory}, a file name relative to a site's source directory,
 and copies them into @var{dest}, a prefix relative to a site's target
 output directory.  By default, @var{dest} is @var{directory}.
 @end deffn
