@@ -81,7 +81,7 @@ There is NO WARRANTY, to the extent permitted by law.~%"
   (exit 0))
 
 (define (leave format-string . args)
-  "Display error message and exist."
+  "Display error message and exit."
   (apply format (current-error-port) format-string args)
   (newline)
   (exit 1))
