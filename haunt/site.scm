@@ -55,7 +55,11 @@
 
             make-file-filter
             default-file-filter))
-
+;;define-record-type type
+;;(constructor fieldname …)
+;;predicate
+;;(fieldname accessor [modifier])
+;;site的数据在构建后就再不会更改了，只有accesor没有modifier
 (define-record-type <site>
   (make-site title domain scheme posts-directory file-filter build-directory
              default-metadata make-slug readers builders publishers)
