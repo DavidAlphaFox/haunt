@@ -40,7 +40,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
-  #:use-module (srfi srfi-37)
+  #:use-module (srfi srfi-37);; 引入args-fold
   #:use-module (haunt config)
   #:use-module (haunt site)
   #:use-module (haunt utils)
@@ -92,11 +92,11 @@ There is NO WARRANTY, to the extent permitted by law.~%"
       (leave "~a: invalid number" str)))
 
 (define (simple-args-fold args options default-options)
-  (args-fold args options
-             (lambda (opt name arg result)
+  (args-fold args options ;;命令行中传入的参数和程序支持的命令参数
+             (lambda (opt name arg result) ;; 在options中找不到的参数处理过程
                (leave "~A: unrecognized option" name))
              (lambda (arg result)
-               (leave "~A: extraneuous argument" arg))
+               (leave "~A: extraneuous argument" arg));;用来处理'--'后面的参数，这些参数和程序无关，但是可以传给被调用起来的程序
              default-options))
 
 (define %common-options
@@ -116,29 +116,29 @@ There is NO WARRANTY, to the extent permitted by law.~%"
 
 (define* (load-config file-name)
   "Load configuration from FILE-NAME."
-  (if (file-exists? file-name)
-      (let ((obj (load (absolute-file-name file-name))))
-        (if (site? obj)
+  (if (file-exists? file-name) ;;文件是否存在
+      (let ((obj (load (absolute-file-name file-name)))) ;;加载配置文件
+        (if (site? obj) ;;是否是site配置
             obj
             (leave "configuration object must be a site, got: ~a" obj)))
       (leave "configuration file not found: ~a" file-name)))
-
+;; haunt的命令都是haunt ui下的模块
 (define (run-haunt-command command . args)
   (let* ((module
           (catch 'misc-error
             (lambda ()
-              (resolve-interface `(haunt ui ,command)))
+              (resolve-interface `(haunt ui ,command))) ;;在haunt ui下面找到对应的模块
             (lambda -
               (format (current-error-port) "~a: invalid subcommand~%" command)
               (show-haunt-usage))))
-         (command-main (module-ref module (symbol-append 'haunt- command))))
+         (command-main (module-ref module (symbol-append 'haunt- command)))) ;;获取对应模块中对应函数
     (parameterize ((program-name command))
       (apply command-main args))))
 
 (define* (haunt-main arg0 . args)
   ;; Add haunt site directory to Guile's load path so that user's can
   ;; easily import their own modules.
-  (add-to-load-path (getcwd))
+  (add-to-load-path (getcwd)) ;;将当前目录放入加载路径中
   (setlocale LC_ALL "")
   (match args
     (()

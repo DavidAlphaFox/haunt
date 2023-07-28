@@ -91,7 +91,7 @@ charcter."
 working directory for FILE-NAME, a relative file name string.  If
 FILE-NAME happens to already be absolute, FILE-NAME is returned
 as-is."
-  (if (absolute-file-name? file-name)
+  (if (absolute-file-name? file-name) ;;是否是绝对路径的文件
       file-name
       (string-append (getcwd) "/" file-name)))
 

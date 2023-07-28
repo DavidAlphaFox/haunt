@@ -52,10 +52,10 @@ Compile the site defined in the current directory.~%")
          %common-options))
 
 (define %default-options %default-common-options)
-
+;; 页面构建命令
 (define (haunt-build . args)
   (let* ((opts (simple-args-fold args %options %default-options))
-         (site (load-config (assq-ref opts 'config))))
+         (site (load-config (assq-ref opts 'config)))) ;;加载配置文件
     (format #t "building pages in '~a'...~%" (site-build-directory site))
     (build-site site)
     (display "build completed successfully\n")))
