@@ -65,11 +65,11 @@ files in DIRECTORY that match KEEP?, recursively."
   ;; is converted into a list of components, manipulated, then
   ;; converted back into a string.
   (define leaf
-    (let ((base-length (length (file-name-components directory)))
-          (dest* (file-name-components dest)))
+    (let ((base-length (length (file-name-components directory))) ;;计算所有路径所有目录
+          (dest* (file-name-components dest)));;目标文件所有的路径
       (lambda (file-name stat memo)
-        (if (keep? file-name)
-            (let* ((file-name* (file-name-components file-name))
+        (if (keep? file-name);; 是否保存该文件
+            (let* ((file-name* (file-name-components file-name)) ;; 计算该文件的路径
                    (target (join-file-name-components
                             (append dest* (drop file-name* base-length)))))
               (cons (verbatim-artifact file-name target) memo))

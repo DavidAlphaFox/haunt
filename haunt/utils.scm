@@ -74,14 +74,14 @@ charcter."
         (list (string-take str i)
               (string-drop str (1+ i)))
         (list str))))
-
+;;将文件路径分拆成各种component
 (define (file-name-components file-name)
   "Split FILE-NAME into the components delimited by '/'."
   (match file-name
     ("" '())
     ("/" '(""))
     (_ (remove string-null? (string-split file-name #\/)))))
-
+;; 将所有的路径连接起来
 (define (join-file-name-components components)
   "Join COMPONENTS into a file name string."
   (string-join components "/"))
