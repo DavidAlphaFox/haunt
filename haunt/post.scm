@@ -87,7 +87,7 @@ specified."
 
 (define (post-time post)
   (date->time-utc (post-date post)))
-
+;;将posts按时间顺序升序排列
 (define (posts/reverse-chronological posts)
   "Returns POSTS sorted in reverse chronological order."
   (sort posts

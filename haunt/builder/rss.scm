@@ -86,7 +86,7 @@
                                         (list key value)))
                                      (enclosure-extra enclosure)))))
              (post-ref-all post 'enclosure)))))
-
+;;生成rss数据，builder模式,函数生成函数
 (define* (rss-feed #:key
                    (file-name "rss-feed.xml")
                    (subtitle "Recent Posts")

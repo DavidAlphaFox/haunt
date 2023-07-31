@@ -19,7 +19,7 @@
 ;;; Commentary:
 ;;
 ;; Build artifact data type.
-;;
+;; 构建成品
 ;;; Code:
 
 (define-module (haunt artifact)
@@ -48,10 +48,10 @@
     ((artifact-writer artifact) output)
     (unless (file-exists? output)
       (error "failed to create artifact output file" output))))
-
+;; 序列化到目标文件
 (define (serialized-artifact destination obj serialize)
-  (make-artifact destination
-                 (lambda (output)
+  (make-artifact destination ;;文件名
+                 (lambda (output) ;;writer函数
                    (format #t "write '~a'~%" destination)
                    (call-with-output-file output
                      (lambda (port)
