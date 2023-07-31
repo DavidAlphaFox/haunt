@@ -55,7 +55,11 @@
 
             make-file-filter
             default-file-filter))
-
+;;define-record-type type
+;;(constructor fieldname …)
+;;predicate
+;;(fieldname accessor [modifier])
+;;site的数据在构建后就再不会更改了，只有accesor没有modifier
 (define-record-type <site>
   (make-site title domain scheme posts-directory file-filter build-directory
              default-metadata make-slug readers builders publishers)
@@ -109,19 +113,19 @@ PUBLISHERS: A list of publisher objects for upload site contents to a remote loc
 
 (define (site-absolute-build-directory site)
   (absolute-file-name (site-build-directory site)))
-
+;;进行站点构建
 (define (build-site site)
   "Build SITE in the appropriate build directory."
-  (let ((posts (if (file-exists? (site-posts-directory site))
+  (let ((posts (if (file-exists? (site-posts-directory site)) ;;site文件夹是否存在
                    (read-posts (site-posts-directory site)
                                (site-file-filter site)
                                (site-readers site)
                                (site-default-metadata site))
                    '()))
-        (build-dir (site-absolute-build-directory site)))
+        (build-dir (site-absolute-build-directory site)));;build结果文件夹
     (when (file-exists? build-dir)
-      (delete-file-recursively build-dir)
-      (mkdir build-dir))
+      (delete-file-recursively build-dir) ;;删除build文件夹
+      (mkdir build-dir));;重建build文件夹
     (for-each (match-lambda
                 ((? page? page)
                  (issue-deprecation-warning
@@ -142,7 +146,7 @@ PUBLISHERS: A list of publisher objects for upload site contents to a remote loc
                 (obj
                  (error "unrecognized site object: " obj)))
               (flat-map (cut <> site posts) (site-builders site)))))
-
+;; (cut <> site posts) => (lambda (proc) (proc site posts))
 (define* (publish-site site name)
   "Publish SITE to another location using the publisher named NAME."
   (unless (file-exists? (site-absolute-build-directory site))
