@@ -47,15 +47,15 @@
             date->string*
 
             blog))
-
+;; 定义主题
 (define-record-type <theme>
   (make-theme name layout post-template collection-template pagination-template)
   theme?
-  (name theme-name)
-  (layout theme-layout)
-  (post-template theme-post-template)
-  (collection-template theme-collection-template)
-  (pagination-template theme-pagination-template))
+  (name theme-name) ;;主题名称
+  (layout theme-layout);;主题的整体模板
+  (post-template theme-post-template);;主题的文章模板，主要是内容
+  (collection-template theme-collection-template);;主题的索引模板，用来做整个集合的目录
+  (pagination-template theme-pagination-template));;分页用的模板
 
 (define (ugly-default-layout site title body)
   `((doctype "html")
