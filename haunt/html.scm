@@ -48,18 +48,18 @@
     source
     track
     wbr))
-
+;; 不包含任何内容的标签
 (define (void-element? tag)
   "Return #t if TAG is a void element."
   (pair? (memq tag %void-elements)))
-
+;; 对特殊字符进行转义
 (define %escape-chars
   (alist->hash-table
    '((#\" . "quot")
      (#\& . "amp")
      (#\< . "lt")
      (#\> . "gt"))))
-
+;; 遍历字符串中每个字符，进行相应的转义
 (define (string->escaped-html s port)
   "Write the HTML escaped form of S to PORT."
   (define (escape c)
