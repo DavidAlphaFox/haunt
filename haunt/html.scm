@@ -72,7 +72,9 @@
 (define (object->escaped-html obj port)
   "Write the HTML escaped form of OBJ to PORT."
   (string->escaped-html
-   (call-with-output-string (cut display obj <>))
+    (call-with-output-string (cut display obj <>))
+    ;; (cut cons (+ a 1) <>) => (lambda (x2) (cons (+ a 1) x2))
+    ;; this is from (srfi srfi-26)
    port))
 
 (define (attribute-value->html value port)
