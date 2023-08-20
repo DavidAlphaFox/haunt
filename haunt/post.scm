@@ -93,17 +93,18 @@ specified."
   (sort posts
         (lambda (a b)
           (time>? (post-time a) (post-time b)))))
-
+;; 使用tag对文章进行分组
 (define (posts/group-by-tag posts)
   "Return an alist of tags mapped to the posts that used them."
-  (let ((table (make-hash-table)))
+  (let ((table (make-hash-table))) ;; 构建hash表
     (for-each (lambda (post)
                 (for-each (lambda (tag)
-                            (let ((current (hash-ref table tag)))
+                            (let ((current (hash-ref table tag)));;在hash表中找对应的tag
                               (if current
-                                  (hash-set! table tag (cons post current))
-                                  (hash-set! table tag (list post)))))
-                          (or (post-ref post 'tags) '())))
+                                  (hash-set! table tag (cons post current)) ;;tag存在时，将当前文章放到该列表中
+                                  (hash-set! table tag (list post))))) ;;tag不存在，构建新的列表，并将当前文章放入其中
+                          (or (post-ref post 'tags) '());;获取当前文章的标签列表或者直接设置为空列表
+                  ))
               posts)
     (hash-fold alist-cons '() table)))
 
@@ -132,7 +133,7 @@ specified."
         ((string=? line "---") ;;读取到 --- 就返回metadata
           metadata)
        (else
-         (match (map string-trim-both (string-split-at line #\:))
+         (match (map string-trim-both (string-split-at line #\:)) ;; 用： 逐行分割元信息
            (((= string->symbol key) value)
              (loop (alist-cons key (parse-metadata key value) metadata)))
            (_ (error "invalid metadata format: " line))))))))
@@ -140,6 +141,6 @@ specified."
 (register-metadata-parser!
  'tags
  (lambda (str)
-   (map string-trim-both (string-split str #\,))))
+   (map string-trim-both (string-split str #\,))));; tags的解析器，使用“,”进行分割
 
-(register-metadata-parser! 'date string->date*)
+(register-metadata-parser! 'date string->date*) ;; 日期的解析器，直接将字符串转化为日期
