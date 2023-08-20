@@ -128,14 +128,14 @@ specified."
     (let ((line (read-line port)))
       (cond
        ((eof-object? line)
-        (error "end of file while reading metadata: " (port-filename port)))
-       ((string=? line "---")
-        metadata)
+         (error "end of file while reading metadata: " (port-filename port)))
+        ((string=? line "---") ;;读取到 --- 就返回metadata
+          metadata)
        (else
-        (match (map string-trim-both (string-split-at line #\:))
-          (((= string->symbol key) value)
-           (loop (alist-cons key (parse-metadata key value) metadata)))
-          (_ (error "invalid metadata format: " line))))))))
+         (match (map string-trim-both (string-split-at line #\:))
+           (((= string->symbol key) value)
+             (loop (alist-cons key (parse-metadata key value) metadata)))
+           (_ (error "invalid metadata format: " line))))))))
 
 (register-metadata-parser!
  'tags
